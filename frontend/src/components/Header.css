@@ -1,0 +1,41 @@
+.header {
+
+display: flex;
+justify-content: space-between;
+align-items: center;
+padding: 15px 40px;
+
+background: white;
+border-bottom: 1px solid #eee;
+
+}
+
+.logo-container {
+
+display: flex;
+align-items: center;
+gap: 10px;
+
+}
+
+.logo {
+
+width: 40px;
+height: 40px;
+
+}
+
+nav a {
+
+margin-left: 20px;
+text-decoration: none;
+color: #0a8f3d;
+font-weight: bold;
+
+}
+
+nav a:hover {
+
+color: #2ecc71;
+
+}
