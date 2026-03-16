@@ -6,7 +6,9 @@ import Dashboard from "./pages/Dashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 
 function App() {
+
   return (
+
     <BrowserRouter>
 
       <Routes>
@@ -22,7 +24,9 @@ function App() {
       </Routes>
 
     </BrowserRouter>
+
   );
+
 }
 
 export default App;
