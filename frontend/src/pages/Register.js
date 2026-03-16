@@ -1,95 +1,108 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 import "../styles/auth.css";
 
 function Register() {
 
-  const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
+
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    password: ""
+  });
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleRegister = async () => {
+
+    try {
+
+      const response = await axios.post(
+        "http://127.0.0.1:5000/register",
+        formData
+      );
+
+      alert(response.data.message);
+
+      navigate("/login");
+
+    } catch (error) {
+
+      if (error.response) {
+        alert(error.response.data.message);
+      } else {
+        alert("Server error");
+      }
+
+    }
+  };
 
   return (
     <div className="auth-container">
       <div className="auth-card">
 
-        {/* Logo */}
         <div className="auth-logo">
-          <img src="/images/ecodrop-logo.png" alt="EcoDrop Logo" />
+          <img src="/images/ecodrop-logo.png" alt="EcoDrop Logo"/>
         </div>
 
-        <p className="auth-tagline">
-          Deliver Smarter. Live Greener.
-        </p>
+        <p className="auth-tagline">Deliver Smarter. Live Greener.</p>
 
-        {/* Tabs */}
         <div className="auth-tabs">
           <Link to="/login" className="auth-tab">Login</Link>
           <Link to="/register" className="auth-tab active">Register</Link>
         </div>
 
-
-        {/* Full Name */}
         <div className="auth-field">
-          <label>Full Name</label>
-          <input type="text" placeholder="Enter your full name"/>
+          <label>Name</label>
+          <input
+            name="name"
+            placeholder="Enter your name"
+            onChange={handleChange}
+          />
         </div>
 
-
-        {/* Email */}
         <div className="auth-field">
-          <label>Email Address</label>
-          <input type="email" placeholder="Enter your email"/>
+          <label>Email</label>
+          <input
+            name="email"
+            placeholder="Enter your email"
+            onChange={handleChange}
+          />
         </div>
 
-
-        {/* Phone */}
         <div className="auth-field">
-          <label>Phone Number</label>
-          <input type="text" placeholder="Enter your phone number"/>
+          <label>Phone</label>
+          <input
+            name="phone"
+            placeholder="Enter your phone"
+            onChange={handleChange}
+          />
         </div>
 
-
-        {/* Password */}
         <div className="auth-field">
           <label>Password</label>
-
-          <div className="password-wrapper">
-            <input
-              type={showPassword ? "text" : "password"}
-              placeholder="Create a password"
-            />
-
-            <button
-              className="toggle-eye"
-              onClick={() => setShowPassword(!showPassword)}
-            >
-              👁
-            </button>
-          </div>
-
+          <input
+            type="password"
+            name="password"
+            placeholder="Enter your password"
+            onChange={handleChange}
+          />
         </div>
 
-
-        {/* Confirm Password */}
-        <div className="auth-field">
-          <label>Confirm Password</label>
-          <input type="password" placeholder="Confirm your password"/>
-        </div>
-
-
-        {/* Register Button */}
-        <button className="auth-btn">
+        <button
+          className="auth-btn"
+          onClick={handleRegister}
+        >
           Register
         </button>
-
-
-        {/* Info Banner */}
-        <div className="auth-banner">
-          <span className="banner-icon">🌱</span>
-          <p>
-            <strong>Welcome to EcoDrop!</strong> Join our community of
-            eco-conscious individuals sharing items sustainably while
-            reducing waste and environmental impact.
-          </p>
-        </div>
 
       </div>
     </div>
