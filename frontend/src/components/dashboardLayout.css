@@ -1,0 +1,10 @@
+.dash-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.dash-content {
+  flex: 1;
+  padding: 20px;
+}

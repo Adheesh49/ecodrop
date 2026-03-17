@@ -1,14 +1,11 @@
+import DashboardLayout from "../layouts/DashboardLayout";
+
 function Dashboard() {
-
-  const name = localStorage.getItem("name");
-
   return (
-    <div style={{padding:"40px"}}>
-      <h1>User Dashboard</h1>
-      <p>Welcome {name}</p>
-    </div>
+    <DashboardLayout>
+      <h1>Welcome back 👋</h1>
+    </DashboardLayout>
   );
-
 }
 
 export default Dashboard;

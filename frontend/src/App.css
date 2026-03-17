@@ -36,3 +36,31 @@
     transform: rotate(360deg);
   }
 }
+
+body.dark-mode {
+  background: #111;
+  color: white;
+}
+
+body.dark-mode .dash-header {
+  background: #1f2937;
+  border-bottom: 1px solid #333;
+}
+
+body.dark-mode .dash-nav a {
+  color: #ddd;
+}
+
+body.dark-mode .dash-nav a:hover {
+  color: #22a348;
+}
+
+body.dark-mode .dropdown {
+  background: #1f2937;
+  color: white;
+}
+
+body.dark-mode footer {
+  background: #1f2937;
+  color: #ccc;
+}
