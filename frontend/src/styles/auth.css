@@ -11,6 +11,8 @@
   background-color: #e6f7ef;
   font-family: 'Nunito', sans-serif;
   padding: 24px;
+  /* EDIT: smooth transition on dark mode toggle */
+  transition: background 0.3s, color 0.3s;
 }
 
 /* White card */
@@ -25,6 +27,7 @@
   flex-direction: column;
   align-items: center;
   gap: 18px;
+  transition: background 0.3s, box-shadow 0.3s;
 }
 
 /* ── Logo ─────────────────────────────────────────────── */
@@ -45,7 +48,6 @@
   object-fit: contain;
 }
 
-/* Fallback if no image: show initials */
 .auth-logo::after {
   content: attr(data-initials);
   font-size: 28px;
@@ -71,6 +73,7 @@
   border-radius: 999px;
   padding: 4px;
   gap: 0;
+  transition: background 0.3s;
 }
 
 .auth-tab {
@@ -103,6 +106,7 @@
   font-size: 13px;
   font-weight: 700;
   color: #222;
+  transition: color 0.3s;
 }
 
 .auth-field input {
@@ -115,7 +119,7 @@
   font-family: 'Nunito', sans-serif;
   color: #333;
   outline: none;
-  transition: box-shadow 0.2s;
+  transition: box-shadow 0.2s, background 0.3s, color 0.3s;
   box-sizing: border-box;
 }
 
@@ -215,4 +219,63 @@
 
 .auth-banner strong {
   color: #1a6640;
+}
+
+/* ── EDIT: Dark mode overrides ────────────────────────────
+   All rules below activate when body has .dark-mode class  */
+
+body.dark-mode .auth-container {
+  background-color: #111;
+}
+
+body.dark-mode .auth-card {
+  background: #1f2937;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+body.dark-mode .auth-tagline {
+  color: #22a348;
+}
+
+body.dark-mode .auth-tabs {
+  background: #374151;
+}
+
+body.dark-mode .auth-tab {
+  color: #aaa;
+}
+
+body.dark-mode .auth-tab.active {
+  background: #111;
+  color: #eee;
+}
+
+body.dark-mode .auth-field label {
+  color: #ddd;
+}
+
+body.dark-mode .auth-field input {
+  background: #374151;
+  color: #eee;
+}
+
+body.dark-mode .auth-field input::placeholder {
+  color: #6b7280;
+}
+
+body.dark-mode .auth-field input:focus {
+  background: #2d3748;
+  box-shadow: 0 0 0 2.5px #22a34855;
+}
+
+body.dark-mode .auth-banner {
+  background: #1a2e1f;
+}
+
+body.dark-mode .auth-banner p {
+  color: #6ee7a0;
+}
+
+body.dark-mode .auth-banner strong {
+  color: #4ade80;
 }

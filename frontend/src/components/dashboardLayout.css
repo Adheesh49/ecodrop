@@ -3,9 +3,16 @@
   flex-direction: column;
   min-height: 100vh;
   background-color: #dff5e1;
+  /* EDIT: smooth transition when dark mode toggles */
+  transition: background 0.3s;
 }
 
 .dash-content {
   flex: 1;
   padding: 20px;
+}
+
+/* EDIT: dark mode override — was hardcoded #dff5e1, now goes dark */
+body.dark-mode .dash-layout {
+  background-color: #111;
 }

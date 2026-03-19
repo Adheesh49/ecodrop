@@ -1,8 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
+// EDIT: removed useEffect import — no longer needed here since dark mode is managed in App.js
 import { useNavigate, Link } from "react-router-dom";
 import "./dashboardHeader.css";
 
-function DashboardHeader() {
+// EDIT: accept toggleDarkMode as a prop from Dashboard (which receives it from App.js)
+function DashboardHeader({ toggleDarkMode }) {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -23,19 +25,10 @@ function DashboardHeader() {
     navigate("/login");
   };
 
-  const toggleDarkMode = () => {
-    document.body.classList.toggle("dark-mode");
+  // EDIT: removed local toggleDarkMode function — it was toggling body class independently
+  // and conflicting with App.js state. Now handled globally via the prop.
 
-    const isDark = document.body.classList.contains("dark-mode");
-    localStorage.setItem("darkMode", isDark);
-  };
-
-  useEffect(() => {
-    const saved = localStorage.getItem("darkMode") === "true";
-    if (saved) {
-      document.body.classList.add("dark-mode");
-    }
-  }, []);
+  // EDIT: removed useEffect that re-applied dark-mode on mount — App.js handles this now.
 
   return (
     <header className="dash-header">
@@ -71,6 +64,7 @@ function DashboardHeader() {
         {open && (
           <div className="dropdown">
             <p onClick={() => navigate("/profile")}>Manage Profile</p>
+            {/* EDIT: now calls the prop instead of the local function */}
             <p onClick={toggleDarkMode}>🌙 Dark Mode</p>
             <p onClick={handleLogout}>Logout</p>
           </div>

@@ -5,9 +5,19 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* EDIT: smooth transition when dark mode toggles */
+  transition: background 0.3s, color 0.3s;
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+/* ── EDIT: global dark mode base ───────────────────────────
+   These apply to the whole page. Each CSS file then adds
+   its own component-level overrides below.               */
+body.dark-mode {
+  background: #111;
+  color: #eee;
 }

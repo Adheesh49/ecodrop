@@ -8,6 +8,8 @@
   position: sticky;
   top: 0;
   z-index: 100;
+  /* EDIT: smooth transition when dark mode toggles */
+  transition: background 0.3s, border-color 0.3s;
 }
 
 .dash-left {
@@ -36,7 +38,7 @@
   text-decoration: none;
   color: #555;
   font-weight: 600;
-  transition: 0.2s;
+  transition: color 0.2s;
 }
 
 .dash-nav a:hover {
@@ -77,14 +79,44 @@
   border-radius: 10px;
   padding: 10px 0;
   width: 180px;
+  transition: background 0.3s;
 }
 
 .dropdown p {
   padding: 10px 15px;
   cursor: pointer;
   font-size: 14px;
+  transition: background 0.2s;
 }
 
 .dropdown p:hover {
   background: #f5f5f5;
+}
+
+/* EDIT: dark mode overrides — header, nav links, and dropdown all go dark */
+
+body.dark-mode .dash-header {
+  background: #1f2937;
+  border-bottom: 1px solid #374151;
+}
+
+body.dark-mode .dash-nav a {
+  color: #ddd;
+}
+
+body.dark-mode .dash-nav a:hover {
+  color: #22a348;
+}
+
+body.dark-mode .dropdown {
+  background: #1f2937;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+body.dark-mode .dropdown p {
+  color: #ddd;
+}
+
+body.dark-mode .dropdown p:hover {
+  background: #374151;
 }

@@ -2,10 +2,12 @@ import DashboardHeader from "../components/DashboardHeader";
 import Footer from "../components/Footer";
 import "../components/dashboardLayout.css";
 
-function DashboardLayout({ children }) {
+// EDIT: accept toggleDarkMode and forward it to DashboardHeader
+function DashboardLayout({ children, toggleDarkMode }) {
   return (
     <div className="dash-layout">
-      <DashboardHeader />
+      {/* EDIT: pass toggleDarkMode so DashboardHeader can call it from the dropdown */}
+      <DashboardHeader toggleDarkMode={toggleDarkMode} />
 
       <div className="dash-content">
         {children}

@@ -1,28 +1,30 @@
 import { Link } from "react-router-dom";
+// EDIT: removed all inline styles — moved to Home.css so dark mode CSS can override them
+import "./Home.css";
 
 function Home() {
   return (
-    <div style={styles.container}>
+    <div className="home-container">
 
-      <h1 style={styles.logo}>EcoDrop</h1>
+      <h1 className="home-logo">EcoDrop</h1>
 
-      <p style={styles.tagline}>
+      <p className="home-tagline">
         Share. Borrow. Reduce Waste.
       </p>
 
-      <p style={styles.desc}>
+      <p className="home-desc">
         EcoDrop helps communities share household items instead of buying new ones.
         Save money and reduce environmental waste.
       </p>
 
-      <div style={styles.buttons}>
+      <div className="home-buttons">
 
         <Link to="/login">
-          <button style={styles.loginBtn}>Login</button>
+          <button className="home-login-btn">Login</button>
         </Link>
 
         <Link to="/register">
-          <button style={styles.registerBtn}>Register</button>
+          <button className="home-register-btn">Register</button>
         </Link>
 
       </div>
@@ -30,53 +32,5 @@ function Home() {
     </div>
   );
 }
-
-const styles = {
-  container: {
-    height: "100vh",
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
-    background: "#dff5e1",
-    textAlign: "center"
-  },
-
-  logo: {
-    fontSize: "48px",
-    color: "#0a8f3d"
-  },
-
-  tagline: {
-    fontSize: "22px",
-    marginTop: "10px"
-  },
-
-  desc: {
-    width: "400px",
-    marginTop: "15px"
-  },
-
-  buttons: {
-    marginTop: "30px"
-  },
-
-  loginBtn: {
-    padding: "12px 30px",
-    marginRight: "15px",
-    background: "#0a8f3d",
-    color: "white",
-    border: "none",
-    borderRadius: "6px"
-  },
-
-  registerBtn: {
-    padding: "12px 30px",
-    background: "#2ecc71",
-    color: "white",
-    border: "none",
-    borderRadius: "6px"
-  }
-};
 
 export default Home;
