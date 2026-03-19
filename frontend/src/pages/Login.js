@@ -22,13 +22,11 @@ function Login() {
         }
       );
 
-      // STORE USER INFO IN BROWSER
       localStorage.setItem("role", response.data.role);
       localStorage.setItem("name", response.data.name);
 
       alert(response.data.message);
 
-      // REDIRECT BASED ON ROLE
       if (response.data.role === "admin") {
         navigate("/admin-dashboard");
       } else {
@@ -46,45 +44,48 @@ function Login() {
     }
   };
 
+  // EDIT: trigger login when Enter key is pressed in any field
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") handleLogin();
+  };
+
   return (
     <div className="auth-container">
       <div className="auth-card">
 
-        {/* Logo */}
         <div className="auth-logo">
           <img src="/images/ecodrop-logo.png" alt="EcoDrop Logo"/>
         </div>
 
-        {/* Tagline */}
         <p className="auth-tagline">Deliver Smarter. Live Greener.</p>
 
-        {/* Tabs */}
         <div className="auth-tabs">
           <Link to="/login" className="auth-tab active">Login</Link>
           <Link to="/register" className="auth-tab">Register</Link>
         </div>
 
-        {/* Email */}
         <div className="auth-field">
           <label>Email</label>
           <input
             type="email"
             placeholder="Enter your email"
             onChange={(e) => setEmail(e.target.value)}
+            // EDIT: added onKeyDown to support Enter key
+            onKeyDown={handleKeyDown}
           />
         </div>
 
-        {/* Password */}
         <div className="auth-field">
           <label>Password</label>
           <input
             type="password"
             placeholder="Enter your password"
             onChange={(e) => setPassword(e.target.value)}
+            // EDIT: added onKeyDown to support Enter key
+            onKeyDown={handleKeyDown}
           />
         </div>
 
-        {/* Login Button */}
         <button
           className="auth-btn"
           onClick={handleLogin}

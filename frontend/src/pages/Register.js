@@ -45,6 +45,11 @@ function Register() {
     }
   };
 
+  // EDIT: trigger register when Enter key is pressed in any field
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") handleRegister();
+  };
+
   return (
     <div className="auth-container">
       <div className="auth-card">
@@ -66,6 +71,8 @@ function Register() {
             name="name"
             placeholder="Enter your name"
             onChange={handleChange}
+            // EDIT: added onKeyDown to support Enter key
+            onKeyDown={handleKeyDown}
           />
         </div>
 
@@ -75,6 +82,8 @@ function Register() {
             name="email"
             placeholder="Enter your email"
             onChange={handleChange}
+            // EDIT: added onKeyDown to support Enter key
+            onKeyDown={handleKeyDown}
           />
         </div>
 
@@ -84,6 +93,8 @@ function Register() {
             name="phone"
             placeholder="Enter your phone"
             onChange={handleChange}
+            // EDIT: added onKeyDown to support Enter key
+            onKeyDown={handleKeyDown}
           />
         </div>
 
@@ -94,6 +105,8 @@ function Register() {
             name="password"
             placeholder="Enter your password"
             onChange={handleChange}
+            // EDIT: added onKeyDown to support Enter key
+            onKeyDown={handleKeyDown}
           />
         </div>
 

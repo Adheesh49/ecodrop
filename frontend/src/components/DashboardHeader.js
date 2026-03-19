@@ -1,23 +1,18 @@
-import { useState } from "react";
-// EDIT: removed useEffect import — no longer needed here since dark mode is managed in App.js
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import "./dashboardHeader.css";
 
-// EDIT: accept toggleDarkMode as a prop from Dashboard (which receives it from App.js)
 function DashboardHeader({ toggleDarkMode }) {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
+  const dropdownRef = useRef(null);
 
   const role = localStorage.getItem("role");
   const userName = localStorage.getItem("name") || "User";
   const profilePic = localStorage.getItem("profilePic");
 
   const getInitials = (name) => {
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .toUpperCase();
+    return name.split(" ").map((n) => n[0]).join("").toUpperCase();
   };
 
   const handleLogout = () => {
@@ -25,10 +20,15 @@ function DashboardHeader({ toggleDarkMode }) {
     navigate("/login");
   };
 
-  // EDIT: removed local toggleDarkMode function — it was toggling body class independently
-  // and conflicting with App.js state. Now handled globally via the prop.
-
-  // EDIT: removed useEffect that re-applied dark-mode on mount — App.js handles this now.
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
     <header className="dash-header">
@@ -43,7 +43,8 @@ function DashboardHeader({ toggleDarkMode }) {
         <nav className="dash-nav">
           <Link to="/dashboard">Dashboard</Link>
           <Link to="/items">Items</Link>
-          <Link to="/upload">Upload</Link>
+          {/* EDIT: renamed from Upload to Add Item, points to /add-item */}
+          <Link to="/add-item">Add Item</Link>
           <Link to="/messages">Messages</Link>
 
           {role === "admin" && (
@@ -52,7 +53,7 @@ function DashboardHeader({ toggleDarkMode }) {
         </nav>
       </div>
 
-      <div className="dash-right">
+      <div className="dash-right" ref={dropdownRef}>
         <div className="profile" onClick={() => setOpen(!open)}>
           {profilePic ? (
             <img src={profilePic} alt="profile" />
@@ -64,7 +65,6 @@ function DashboardHeader({ toggleDarkMode }) {
         {open && (
           <div className="dropdown">
             <p onClick={() => navigate("/profile")}>Manage Profile</p>
-            {/* EDIT: now calls the prop instead of the local function */}
             <p onClick={toggleDarkMode}>🌙 Dark Mode</p>
             <p onClick={handleLogout}>Logout</p>
           </div>

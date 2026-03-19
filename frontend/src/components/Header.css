@@ -39,3 +39,8 @@ nav a:hover {
 color: #2ecc71;
 
 }
+
+body.dark-mode .header {
+  background: #1f2937;
+  border-bottom: 1px solid #374151;
+}
