@@ -9,7 +9,8 @@ import Dashboard from "./pages/Dashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import Items from "./pages/Items";
 import ItemDetail from "./pages/ItemDetail";
-import AddItem from "./pages/AddItem"; // EDIT: added AddItem page
+import AddItem from "./pages/AddItem";
+import Messages from "./pages/Messages"; // EDIT: added Messages page
 
 // LAYOUT
 import Layout from "./components/Layout";
@@ -35,17 +36,18 @@ function App() {
       <div className={darkMode ? "app dark" : "app"}>
         <Routes>
 
-          {/* PUBLIC — wrapped in Layout for public Header + Footer */}
+          {/* PUBLIC */}
           <Route path="/" element={<Layout><Home /></Layout>} />
           <Route path="/login" element={<Layout><Login /></Layout>} />
           <Route path="/register" element={<Layout><Register /></Layout>} />
 
-          {/* DASHBOARD — DashboardLayout is used internally */}
+          {/* DASHBOARD */}
           <Route path="/dashboard" element={<Dashboard toggleDarkMode={toggleDarkMode} />} />
           <Route path="/items" element={<Items toggleDarkMode={toggleDarkMode} />} />
           <Route path="/items/:id" element={<ItemDetail toggleDarkMode={toggleDarkMode} />} />
-          {/* EDIT: Add Item is its own page, accessible from nav and items page button */}
           <Route path="/add-item" element={<AddItem toggleDarkMode={toggleDarkMode} />} />
+          {/* EDIT: messages page — also handles ?to=username from item pages */}
+          <Route path="/messages" element={<Messages toggleDarkMode={toggleDarkMode} />} />
           <Route path="/admin-dashboard" element={<AdminDashboard toggleDarkMode={toggleDarkMode} />} />
 
         </Routes>
