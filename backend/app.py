@@ -11,16 +11,16 @@ from routes.messages import messages_bp, register_socket_events
 app = Flask(__name__)
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "ecodrop-secret-key")
 
-# FIX: restrict CORS to localhost and Vercel only
+# FIX: use exact Vercel URL instead of wildcard
 CORS(app, resources={r"/*": {"origins": [
     "http://localhost:3000",
-    "https://*.vercel.app"
+    "https://ecodrop-b69t.vercel.app"
 ]}})
 
-# FIX: restrict SocketIO CORS to localhost and Vercel only
+# FIX: use exact Vercel URL instead of wildcard
 socketio = SocketIO(app, cors_allowed_origins=[
     "http://localhost:3000",
-    "https://*.vercel.app"
+    "https://ecodrop-b69t.vercel.app"
 ])
 
 # REGISTER BLUEPRINTS
