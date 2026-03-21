@@ -6,24 +6,28 @@ import bcrypt
 import os
 
 from routes.items import items_bp
-# EDIT: import messages blueprint and socket event registrar
 from routes.messages import messages_bp, register_socket_events
 
 app = Flask(__name__)
-app.config["SECRET_KEY"] = "ecodrop-secret-key"
+app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "ecodrop-secret-key")
 
-# EDIT: allow CORS for all origins including WebSocket handshake
-CORS(app, resources={r"/*": {"origins": "*"}})
+# FIX: restrict CORS to localhost and Vercel only
+CORS(app, resources={r"/*": {"origins": [
+    "http://localhost:3000",
+    "https://*.vercel.app"
+]}})
 
-# EDIT: init SocketIO with CORS allowed
-socketio = SocketIO(app, cors_allowed_origins="*")
+# FIX: restrict SocketIO CORS to localhost and Vercel only
+socketio = SocketIO(app, cors_allowed_origins=[
+    "http://localhost:3000",
+    "https://*.vercel.app"
+])
 
 # REGISTER BLUEPRINTS
 app.register_blueprint(items_bp)
-# EDIT: register messages REST routes
 app.register_blueprint(messages_bp)
 
-# EDIT: register WebSocket event handlers
+# REGISTER WEBSOCKET EVENT HANDLERS
 register_socket_events(socketio)
 
 
@@ -84,7 +88,6 @@ def login():
     return jsonify({"message": "Incorrect password"}), 401
 
 
-# EDIT: run with socketio instead of app.run so WebSockets work
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     socketio.run(app, debug=False, host="0.0.0.0", port=port)
