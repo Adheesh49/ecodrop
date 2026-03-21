@@ -1,8 +1,3 @@
-cd /Users/adheesh/ecodrop/backend
-```
-
-Open `requirements.txt` and make sure it looks exactly like this:
-```
 bcrypt==5.0.0
 blinker==1.9.0
 certifi
