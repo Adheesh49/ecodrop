@@ -3,19 +3,18 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import "../styles/auth.css";
 
-function Login() {
+const API = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
+function Login() {
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const handleLogin = async () => {
-
     try {
-
       const response = await axios.post(
-        "http://127.0.0.1:5000/login",
+        `${API}/login`,
         {
           email: email,
           password: password
@@ -34,17 +33,14 @@ function Login() {
       }
 
     } catch (error) {
-
       if (error.response) {
         alert(error.response.data.message);
       } else {
         alert("Server error");
       }
-
     }
   };
 
-  // EDIT: trigger login when Enter key is pressed in any field
   const handleKeyDown = (e) => {
     if (e.key === "Enter") handleLogin();
   };
@@ -70,7 +66,6 @@ function Login() {
             type="email"
             placeholder="Enter your email"
             onChange={(e) => setEmail(e.target.value)}
-            // EDIT: added onKeyDown to support Enter key
             onKeyDown={handleKeyDown}
           />
         </div>
@@ -81,15 +76,11 @@ function Login() {
             type="password"
             placeholder="Enter your password"
             onChange={(e) => setPassword(e.target.value)}
-            // EDIT: added onKeyDown to support Enter key
             onKeyDown={handleKeyDown}
           />
         </div>
 
-        <button
-          className="auth-btn"
-          onClick={handleLogin}
-        >
+        <button className="auth-btn" onClick={handleLogin}>
           Login
         </button>
 

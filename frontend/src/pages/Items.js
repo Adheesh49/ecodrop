@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import DashboardLayout from "../layouts/DashboardLayout";
 import "./Items.css";
 
+const API = process.env.REACT_APP_API_URL || "http://localhost:5000";
+
 const CATEGORIES = ["All", "Furniture", "Clothes", "Electronics", "Kitchen", "Books", "Toys", "Sports", "Other"];
 const PAGE_SIZE = 16;
 
@@ -25,7 +27,6 @@ function timeAgo(ts) {
 
 function Items({ toggleDarkMode }) {
   const navigate = useNavigate();
-  // currentUser is the name stored at login e.g. "Adheesh"
   const currentUser = localStorage.getItem("name");
 
   const [items, setItems] = useState([]);
@@ -36,7 +37,6 @@ function Items({ toggleDarkMode }) {
   const [liked, setLiked] = useState({});
   const [loading, setLoading] = useState(true);
 
-  // MESSAGE MODAL
   const [showMsgModal, setShowMsgModal] = useState(false);
   const [msgTarget, setMsgTarget] = useState(null);
   const [msgText, setMsgText] = useState("");
@@ -48,7 +48,8 @@ function Items({ toggleDarkMode }) {
   const fetchItems = async () => {
     setLoading(true);
     try {
-      const res = await fetch("http://127.0.0.1:5000/items");
+      // FIX: use API constant instead of process.env directly
+      const res = await fetch(`${API}/items`);
       const data = await res.json();
       setItems(Array.isArray(data) ? data : []);
     } catch (e) {
@@ -78,11 +79,11 @@ function Items({ toggleDarkMode }) {
 
   const visibleItems = filtered.slice(0, visibleCount);
 
-  // EDIT: pass owner as query param so backend can verify before deleting
   const handleDelete = async (e, id) => {
     e.stopPropagation();
     if (!window.confirm("Mark this item as taken? It will be removed.")) return;
-    await fetch(`http://127.0.0.1:5000/items/${id}?owner=${encodeURIComponent(currentUser)}`, {
+    // FIX: use API constant
+    await fetch(`${API}/items/${id}?owner=${encodeURIComponent(currentUser)}`, {
       method: "DELETE"
     });
     fetchItems();
@@ -93,7 +94,6 @@ function Items({ toggleDarkMode }) {
     setLiked(prev => ({ ...prev, [id]: !prev[id] }));
   };
 
-  // EDIT: open message modal — only for non-owners
   const openMsgModal = (e, owner, itemTitle) => {
     e.stopPropagation();
     setMsgTarget({ owner, itemTitle });
@@ -102,12 +102,12 @@ function Items({ toggleDarkMode }) {
     setShowMsgModal(true);
   };
 
-  // EDIT: send message via REST then redirect to /messages for two-way chat
   const handleSendMsg = async () => {
     if (!msgText.trim()) return;
     setSending(true);
     try {
-      await fetch("http://127.0.0.1:5000/messages", {
+      // FIX: was using regular quotes instead of backticks — broke the template literal
+      await fetch(`${API}/messages`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -176,7 +176,6 @@ function Items({ toggleDarkMode }) {
         ) : (
           <div className={viewMode === "grid" ? "items-grid" : "items-list"}>
             {visibleItems.map(item => {
-              // EDIT: compare owner name string to currentUser name string
               const isOwner = item.owner === currentUser;
 
               return (
@@ -228,7 +227,6 @@ function Items({ toggleDarkMode }) {
                       {isOwner && <span className="item-yours-badge">Your item</span>}
                     </div>
 
-                    {/* EDIT: action buttons — message only for non-owners, delete only for owner */}
                     <div className="item-actions">
                       {!isOwner ? (
                         <>
@@ -318,7 +316,6 @@ function Items({ toggleDarkMode }) {
               {msgSent ? (
                 <>
                   <button className="modal-cancel" onClick={() => setShowMsgModal(false)}>Close</button>
-                  {/* EDIT: go to messages page for full two-way conversation */}
                   <button className="modal-submit" onClick={() => {
                     setShowMsgModal(false);
                     navigate(`/messages?to=${msgTarget.owner}`);

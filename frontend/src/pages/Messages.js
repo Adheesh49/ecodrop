@@ -4,7 +4,9 @@ import { io } from "socket.io-client";
 import DashboardLayout from "../layouts/DashboardLayout";
 import "./Messages.css";
 
-const SOCKET_URL = "http://127.0.0.1:5000";
+// FIX: added separate API constant — SOCKET_URL was already correct
+const SOCKET_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+const API = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
 function Messages({ toggleDarkMode }) {
   const currentUser = localStorage.getItem("name");
@@ -20,31 +22,26 @@ function Messages({ toggleDarkMode }) {
 
   const bottomRef = useRef(null);
   const inputRef = useRef(null);
-  // EDIT: keep activePartner in a ref so socket callbacks always see latest value
   const activePartnerRef = useRef(null);
 
-  // ── Init socket
   useEffect(() => {
     const s = io(SOCKET_URL);
     setSocket(s);
     return () => s.disconnect();
   }, []);
 
-  // EDIT: wrap in useCallback so it can be safely listed as a dependency
   const fetchConversations = useCallback(async () => {
-    const res = await fetch(`${SOCKET_URL}/messages/conversations?user=${currentUser}`);
+    // FIX: use API constant
+    const res = await fetch(`${API}/messages/conversations?user=${currentUser}`);
     const data = await res.json();
     setConversations(data);
   }, [currentUser]);
 
-  // ── Load conversations on mount
   useEffect(() => {
     fetchConversations();
   }, [fetchConversations]);
 
-  // EDIT: wrap in useCallback — depends on socket and currentUser
   const openConversation = useCallback(async (partner) => {
-    // Leave old room
     if (socket && activePartnerRef.current) {
       socket.emit("leave", { user: currentUser, partner: activePartnerRef.current });
     }
@@ -52,33 +49,27 @@ function Messages({ toggleDarkMode }) {
     activePartnerRef.current = partner;
     setActivePartner(partner);
 
-    // Fetch history
+    // FIX: use API constant
     const res = await fetch(
-      `${SOCKET_URL}/messages?user=${currentUser}&partner=${partner}`
+      `${API}/messages?user=${currentUser}&partner=${partner}`
     );
     const data = await res.json();
     setMessages(data);
 
-    // Join new room
     if (socket) {
       socket.emit("join", { user: currentUser, partner });
     }
 
-    // Refresh convos to clear unread badge
     fetchConversations();
-
-    // Focus input
     setTimeout(() => inputRef.current?.focus(), 100);
   }, [socket, currentUser, fetchConversations]);
 
-  // ── If redirected from item page with ?to=someone, open that convo
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const to = params.get("to");
     if (to) openConversation(to);
   }, [location.search, openConversation]);
 
-  // ── Listen for incoming messages via WebSocket
   useEffect(() => {
     if (!socket || !activePartner) return;
 
@@ -92,12 +83,10 @@ function Messages({ toggleDarkMode }) {
     return () => socket.off("receive_message");
   }, [socket, activePartner, currentUser, fetchConversations]);
 
-  // ── Scroll to bottom on new message
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // ── Send message
   const sendMessage = () => {
     if (!input.trim() || !activePartner || !socket) return;
 
@@ -118,7 +107,6 @@ function Messages({ toggleDarkMode }) {
     }
   };
 
-  // ── Format timestamp
   const formatTime = (ts) => {
     if (!ts) return "";
     const d = new Date(ts);
@@ -136,7 +124,6 @@ function Messages({ toggleDarkMode }) {
     return d.toLocaleDateString([], { month: "short", day: "numeric" });
   };
 
-  // ── Group messages by date
   const groupedMessages = messages.reduce((groups, msg) => {
     const date = formatDate(msg.timestamp);
     if (!groups[date]) groups[date] = [];
@@ -207,7 +194,6 @@ function Messages({ toggleDarkMode }) {
         {/* ── CHAT AREA ── */}
         <main className="msg-chat">
           {!activePartner ? (
-
             <div className="msg-empty">
               <div className="msg-empty-icon">💬</div>
               <h3>Your Messages</h3>
@@ -216,7 +202,6 @@ function Messages({ toggleDarkMode }) {
                 Browse Items
               </button>
             </div>
-
           ) : (
             <>
               <div className="msg-chat-header">

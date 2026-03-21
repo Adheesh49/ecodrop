@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import DashboardLayout from "../layouts/DashboardLayout";
 import "./AddItem.css";
 
+const API = process.env.REACT_APP_API_URL || "http://localhost:5000";
+
 const CATEGORIES = ["Furniture", "Clothes", "Electronics", "Kitchen", "Books", "Toys", "Sports", "Other"];
 const CONDITIONS = ["New", "Excellent", "Good", "Fair", "Worn"];
 
@@ -27,9 +29,9 @@ function AddItem({ toggleDarkMode }) {
   const [myItems, setMyItems] = useState([]);
   const [submitting, setSubmitting] = useState(false);
 
-  // FETCH USER'S OWN ITEMS FOR THE SIDEBAR
+  // FIX: was hardcoded 127.0.0.1
   useEffect(() => {
-    fetch("http://127.0.0.1:5000/items")
+    fetch(`${API}/items`)
       .then(r => r.json())
       .then(data => setMyItems(data.filter(i => i.owner === currentUser)));
   }, [currentUser]);
@@ -57,7 +59,8 @@ function AddItem({ toggleDarkMode }) {
       return alert("Please fill in all required fields.");
     }
     setSubmitting(true);
-    await fetch("http://127.0.0.1:5000/items", {
+    // FIX: was hardcoded 127.0.0.1
+    await fetch(`${API}/items`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -84,7 +87,6 @@ function AddItem({ toggleDarkMode }) {
     "Worn": "#ef4444"
   };
 
-  // STATS derived from user's items
   const stats = {
     total: myItems.length,
     delivery: myItems.filter(i => i.ecoDelivery).length,

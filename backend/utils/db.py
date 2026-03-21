@@ -1,12 +1,20 @@
+# utils/db.py
+import os
+import certifi
 from pymongo import MongoClient
+from dotenv import load_dotenv
 
-# connect to local MongoDB server
-client = MongoClient("mongodb://localhost:27017/")
+load_dotenv()
 
-# create / connect to ecodrop database
+MONGO_URI = os.environ.get("MONGO_URI", "mongodb://localhost:27017/")
+
+client = MongoClient(
+    MONGO_URI,
+    tlsCAFile=certifi.where()   # ← this fixes the SSL error
+)
+
 db = client["ecodrop"]
 
-# collections
 users = db["users"]
 items = db["items"]
 bookings = db["bookings"]

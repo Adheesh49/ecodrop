@@ -3,6 +3,7 @@ from flask_cors import CORS
 from flask_socketio import SocketIO
 from utils.db import users
 import bcrypt
+import os
 
 from routes.items import items_bp
 # EDIT: import messages blueprint and socket event registrar
@@ -85,4 +86,5 @@ def login():
 
 # EDIT: run with socketio instead of app.run so WebSockets work
 if __name__ == "__main__":
-    socketio.run(app, debug=True, port=5000)
+    port = int(os.environ.get("PORT", 5000))
+    socketio.run(app, debug=False, host="0.0.0.0", port=port)

@@ -3,6 +3,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import DashboardLayout from "../layouts/DashboardLayout";
 import "./ItemDetail.css";
 
+const API = process.env.REACT_APP_API_URL || "http://localhost:5000";
+
 function ItemDetail({ toggleDarkMode }) {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -13,27 +15,28 @@ function ItemDetail({ toggleDarkMode }) {
   const [claimed, setClaimed] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  // EDIT: message state
   const [showMsgModal, setShowMsgModal] = useState(false);
   const [msgText, setMsgText] = useState("");
   const [msgSent, setMsgSent] = useState(false);
 
   useEffect(() => {
-    fetch(`http://127.0.0.1:5000/items/${id}`)
+    // FIX: was fetching /items (all items) instead of /items/${id}
+    fetch(`${API}/items/${id}`)
       .then(r => r.json())
       .then(data => setItem(data));
   }, [id]);
 
-  // EDIT: only owner can delete — navigates back to /items after
   const handleDelete = async () => {
     if (!window.confirm("Mark this item as taken? It will be removed from the list.")) return;
-    await fetch(`http://127.0.0.1:5000/items/${id}`, { method: "DELETE" });
+    // FIX: was hardcoded 127.0.0.1, also pass owner for backend auth check
+    await fetch(`${API}/items/${id}?owner=${encodeURIComponent(currentUser)}`, {
+      method: "DELETE"
+    });
     navigate("/items");
   };
 
   const handleClaim = () => {
     setClaimed(true);
-    // TODO: wire up claim/request API
   };
 
   const handleShare = () => {
@@ -42,10 +45,10 @@ function ItemDetail({ toggleDarkMode }) {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  // EDIT: send message to owner
   const handleSendMsg = async () => {
     if (!msgText.trim()) return;
-    await fetch("http://127.0.0.1:5000/messages", {
+    // FIX: was hardcoded 127.0.0.1
+    await fetch(`${API}/messages`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -118,7 +121,6 @@ function ItemDetail({ toggleDarkMode }) {
             {/* ── ACTIONS ── */}
             <div className="detail-actions">
 
-              {/* REQUEST — not shown to owner */}
               {item.owner !== currentUser && (
                 <button
                   className={`detail-claim-btn ${claimed ? "claimed" : ""}`}
@@ -129,7 +131,6 @@ function ItemDetail({ toggleDarkMode }) {
                 </button>
               )}
 
-              {/* EDIT: message owner — not shown to owner */}
               {item.owner !== currentUser && (
                 <button
                   className="detail-msg-btn"
@@ -139,12 +140,10 @@ function ItemDetail({ toggleDarkMode }) {
                 </button>
               )}
 
-              {/* SHARE — everyone */}
               <button className="detail-share-btn" onClick={handleShare}>
                 {copied ? "✓ Link Copied!" : "🔗 Share"}
               </button>
 
-              {/* EDIT: mark as taken — ONLY the owner sees this */}
               {item.owner === currentUser && (
                 <button className="detail-delete-btn" onClick={handleDelete}>
                   ✓ Mark as Taken

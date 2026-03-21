@@ -3,8 +3,9 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import "../styles/auth.css";
 
-function Register() {
+const API = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
+function Register() {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -22,30 +23,24 @@ function Register() {
   };
 
   const handleRegister = async () => {
-
     try {
-
       const response = await axios.post(
-        "http://127.0.0.1:5000/register",
+        `${API}/register`,
         formData
       );
 
       alert(response.data.message);
-
       navigate("/login");
 
     } catch (error) {
-
       if (error.response) {
         alert(error.response.data.message);
       } else {
         alert("Server error");
       }
-
     }
   };
 
-  // EDIT: trigger register when Enter key is pressed in any field
   const handleKeyDown = (e) => {
     if (e.key === "Enter") handleRegister();
   };
@@ -71,7 +66,6 @@ function Register() {
             name="name"
             placeholder="Enter your name"
             onChange={handleChange}
-            // EDIT: added onKeyDown to support Enter key
             onKeyDown={handleKeyDown}
           />
         </div>
@@ -82,7 +76,6 @@ function Register() {
             name="email"
             placeholder="Enter your email"
             onChange={handleChange}
-            // EDIT: added onKeyDown to support Enter key
             onKeyDown={handleKeyDown}
           />
         </div>
@@ -93,7 +86,6 @@ function Register() {
             name="phone"
             placeholder="Enter your phone"
             onChange={handleChange}
-            // EDIT: added onKeyDown to support Enter key
             onKeyDown={handleKeyDown}
           />
         </div>
@@ -105,15 +97,11 @@ function Register() {
             name="password"
             placeholder="Enter your password"
             onChange={handleChange}
-            // EDIT: added onKeyDown to support Enter key
             onKeyDown={handleKeyDown}
           />
         </div>
 
-        <button
-          className="auth-btn"
-          onClick={handleRegister}
-        >
+        <button className="auth-btn" onClick={handleRegister}>
           Register
         </button>
 
