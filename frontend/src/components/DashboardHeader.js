@@ -46,6 +46,7 @@ function DashboardHeader({ toggleDarkMode }) {
           {/* EDIT: renamed from Upload to Add Item, points to /add-item */}
           <Link to="/add-item">Add Item</Link>
           <Link to="/messages">Messages</Link>
+          <Link to="/courier">Courier</Link>
 
           {role === "admin" && (
             <Link to="/admin-dashboard">Admin</Link>

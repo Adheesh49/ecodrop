@@ -4,6 +4,7 @@ from flask_socketio import SocketIO
 from utils.db import users
 import bcrypt
 import os
+from routes.admin import admin_bp
 
 from routes.items import items_bp
 from routes.messages import messages_bp, register_socket_events
@@ -26,6 +27,7 @@ socketio = SocketIO(app, cors_allowed_origins=[
 # REGISTER BLUEPRINTS
 app.register_blueprint(items_bp)
 app.register_blueprint(messages_bp)
+app.register_blueprint(admin_bp)
 
 # REGISTER WEBSOCKET EVENT HANDLERS
 register_socket_events(socketio)

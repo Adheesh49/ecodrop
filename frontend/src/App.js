@@ -10,7 +10,8 @@ import AdminDashboard from "./pages/AdminDashboard";
 import Items from "./pages/Items";
 import ItemDetail from "./pages/ItemDetail";
 import AddItem from "./pages/AddItem";
-import Messages from "./pages/Messages"; // EDIT: added Messages page
+import Messages from "./pages/Messages"; 
+import Courier from "./pages/Courier";
 
 // LAYOUT
 import Layout from "./components/Layout";
@@ -49,6 +50,8 @@ function App() {
           {/* EDIT: messages page — also handles ?to=username from item pages */}
           <Route path="/messages" element={<Messages toggleDarkMode={toggleDarkMode} />} />
           <Route path="/admin-dashboard" element={<AdminDashboard toggleDarkMode={toggleDarkMode} />} />
+          <Route path="/admin-dashboard" element={<AdminDashboard toggleDarkMode={toggleDarkMode} />} />
+          <Route path="/courier" element={<Courier toggleDarkMode={toggleDarkMode} />} /> 
 
         </Routes>
       </div>
