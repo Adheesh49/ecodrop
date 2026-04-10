@@ -7,7 +7,6 @@ const API = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
 function Courier({ toggleDarkMode }) {
   const navigate = useNavigate();
-  const currentUser = localStorage.getItem("name");
 
   const [deliveryItems, setDeliveryItems] = useState([]);
   const [loading, setLoading] = useState(true);
