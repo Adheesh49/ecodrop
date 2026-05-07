@@ -2,6 +2,7 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import DashboardLayout from "../layouts/DashboardLayout";
 import "./Items.css";
+import { aiTextSearch, aiImageSearch } from "../utils/aiSearch";
 
 const API = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
@@ -43,12 +44,16 @@ function Items({ toggleDarkMode }) {
   const [msgSent, setMsgSent] = useState(false);
   const [sending, setSending] = useState(false);
 
+  // AI search state
+  const [aiSearching, setAiSearching] = useState(false);
+  const [aiResults, setAiResults] = useState(null);
+  const [imgSearch, setImgSearch] = useState(false);
+
   const loaderRef = useRef(null);
 
   const fetchItems = async () => {
     setLoading(true);
     try {
-      // FIX: use API constant instead of process.env directly
       const res = await fetch(`${API}/items`);
       const data = await res.json();
       setItems(Array.isArray(data) ? data : []);
@@ -71,18 +76,63 @@ function Items({ toggleDarkMode }) {
     return () => observer.disconnect();
   }, [handleObserver]);
 
-  const filtered = items.filter(item => {
-    const matchSearch = item.title?.toLowerCase().includes(search.toLowerCase());
-    const matchCat = category === "All" || item.category === category;
-    return matchSearch && matchCat;
-  });
+  // AI text search handler with 600ms debounce
+  const handleSearch = async (e) => {
+    const value = e.target.value;
+    setSearch(value);
+    setVisibleCount(PAGE_SIZE);
+
+    if (!value.trim()) {
+      setAiResults(null);
+      return;
+    }
+
+    clearTimeout(window._searchTimer);
+    window._searchTimer = setTimeout(async () => {
+      setAiSearching(true);
+      const results = await aiTextSearch(items, value);
+      setAiResults(results);
+      setAiSearching(false);
+    }, 600);
+  };
+
+  // AI image search handler
+  const handleImageSearch = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setImgSearch(true);
+    setAiSearching(true);
+    setSearch("");
+    setAiResults(null);
+
+    const reader = new FileReader();
+    reader.onload = async (ev) => {
+      const base64 = ev.target.result;
+      const mediaType = file.type;
+      const results = await aiImageSearch(items, base64, mediaType);
+      setAiResults(results);
+      setAiSearching(false);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const clearImageSearch = () => {
+    setImgSearch(false);
+    setAiResults(null);
+    setSearch("");
+  };
+
+  // Use AI results if available, otherwise use all items
+  const filtered = (aiResults !== null ? aiResults : items).filter(item =>
+    category === "All" || item.category === category
+  );
 
   const visibleItems = filtered.slice(0, visibleCount);
 
   const handleDelete = async (e, id) => {
     e.stopPropagation();
     if (!window.confirm("Mark this item as taken? It will be removed.")) return;
-    // FIX: use API constant
     await fetch(`${API}/items/${id}?owner=${encodeURIComponent(currentUser)}`, {
       method: "DELETE"
     });
@@ -106,7 +156,6 @@ function Items({ toggleDarkMode }) {
     if (!msgText.trim()) return;
     setSending(true);
     try {
-      // FIX: was using regular quotes instead of backticks — broke the template literal
       await fetch(`${API}/messages`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -133,19 +182,53 @@ function Items({ toggleDarkMode }) {
         {/* ── TOP BAR ── */}
         <div className="items-topbar">
           <div className="items-search-wrap">
-            <span className="search-icon">🔍</span>
-            <input
-              className="items-search"
-              type="text"
-              placeholder="Search items..."
-              value={search}
-              onChange={(e) => { setSearch(e.target.value); setVisibleCount(PAGE_SIZE); }}
-            />
+            <span className="search-icon">
+              {aiSearching ? "⏳" : imgSearch ? "🖼️" : "🔍"}
+            </span>
+            {imgSearch ? (
+              <div className="img-search-active">
+                <span>
+                  {aiSearching ? "AI is analysing your image..." : "Showing results for your image"}
+                </span>
+                <button className="img-search-clear" onClick={clearImageSearch}>
+                  ✕ Clear
+                </button>
+              </div>
+            ) : (
+              <input
+                className="items-search"
+                type="text"
+                placeholder="Search items... (AI-powered 🤖)"
+                value={search}
+                onChange={handleSearch}
+              />
+            )}
           </div>
-          <button className="add-item-btn" onClick={() => navigate("/add-item")}>+ Add Item</button>
+
+          {/* IMAGE SEARCH BUTTON */}
+          <label className="img-search-btn" title="Search by image">
+            📷
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageSearch}
+              style={{ display: "none" }}
+            />
+          </label>
+
+          <button className="add-item-btn" onClick={() => navigate("/add-item")}>
+            + Add Item
+          </button>
+
           <div className="view-toggle">
-            <button className={viewMode === "grid" ? "active" : ""} onClick={() => setViewMode("grid")}>⊞</button>
-            <button className={viewMode === "list" ? "active" : ""} onClick={() => setViewMode("list")}>☰</button>
+            <button
+              className={viewMode === "grid" ? "active" : ""}
+              onClick={() => setViewMode("grid")}
+            >⊞</button>
+            <button
+              className={viewMode === "list" ? "active" : ""}
+              onClick={() => setViewMode("list")}
+            >☰</button>
           </div>
         </div>
 
@@ -160,8 +243,16 @@ function Items({ toggleDarkMode }) {
           ))}
         </div>
 
+        {/* ── RESULTS COUNT ── */}
         <p className="results-count">
-          {loading ? "Loading..." : `${filtered.length} item${filtered.length !== 1 ? "s" : ""} available`}
+          {loading
+            ? "Loading..."
+            : aiSearching
+            ? "🤖 AI is searching..."
+            : aiResults !== null
+            ? `🤖 AI found ${filtered.length} item${filtered.length !== 1 ? "s" : ""} for "${search || "your image"}"`
+            : `${filtered.length} item${filtered.length !== 1 ? "s" : ""} available`
+          }
         </p>
 
         {/* ── ITEMS ── */}
@@ -170,8 +261,24 @@ function Items({ toggleDarkMode }) {
         ) : visibleItems.length === 0 ? (
           <div className="items-empty">
             <span>🌿</span>
-            <p>No items found. Be the first to share something!</p>
-            <button className="add-item-btn" onClick={() => navigate("/add-item")}>+ Add Item</button>
+            <p>
+              {aiResults !== null
+                ? "No items matched your search. Try different keywords or an image."
+                : "No items found. Be the first to share something!"
+              }
+            </p>
+            {aiResults !== null ? (
+              <button
+                className="add-item-btn"
+                onClick={() => { setAiResults(null); setSearch(""); setImgSearch(false); }}
+              >
+                Clear Search
+              </button>
+            ) : (
+              <button className="add-item-btn" onClick={() => navigate("/add-item")}>
+                + Add Item
+              </button>
+            )}
           </div>
         ) : (
           <div className={viewMode === "grid" ? "items-grid" : "items-list"}>
@@ -306,7 +413,10 @@ function Items({ toggleDarkMode }) {
                     value={msgText}
                     onChange={(e) => setMsgText(e.target.value)}
                     onKeyDown={(e) => {
-                      if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSendMsg(); }
+                      if (e.key === "Enter" && !e.shiftKey) {
+                        e.preventDefault();
+                        handleSendMsg();
+                      }
                     }}
                   />
                 </>
@@ -315,7 +425,9 @@ function Items({ toggleDarkMode }) {
             <div className="modal-footer">
               {msgSent ? (
                 <>
-                  <button className="modal-cancel" onClick={() => setShowMsgModal(false)}>Close</button>
+                  <button className="modal-cancel" onClick={() => setShowMsgModal(false)}>
+                    Close
+                  </button>
                   <button className="modal-submit" onClick={() => {
                     setShowMsgModal(false);
                     navigate(`/messages?to=${msgTarget.owner}`);
@@ -325,7 +437,9 @@ function Items({ toggleDarkMode }) {
                 </>
               ) : (
                 <>
-                  <button className="modal-cancel" onClick={() => setShowMsgModal(false)}>Cancel</button>
+                  <button className="modal-cancel" onClick={() => setShowMsgModal(false)}>
+                    Cancel
+                  </button>
                   <button className="modal-submit" onClick={handleSendMsg} disabled={sending}>
                     {sending ? "Sending..." : "Send 💬"}
                   </button>

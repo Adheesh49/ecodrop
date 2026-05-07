@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request
 from utils.db import db
 from bson import ObjectId
+import bcrypt
 
 admin_bp = Blueprint("admin", __name__)
 users_col = db["users"]
@@ -36,3 +37,19 @@ def get_all_items():
 def delete_item(id):
     items_col.delete_one({"_id": ObjectId(id)})
     return jsonify({"message": "Item deleted"})
+
+# ADD THIS ROUTE
+@admin_bp.route("/admin/users/<id>/reset-password", methods=["POST"])
+def reset_password(id):
+    data = request.json
+    new_password = data.get("password", "")
+
+    if not new_password or len(new_password) < 6:
+        return jsonify({"message": "Password must be at least 6 characters"}), 400
+
+    hashed = bcrypt.hashpw(new_password.encode("utf-8"), bcrypt.gensalt())
+    users_col.update_one(
+        {"_id": ObjectId(id)},
+        {"$set": {"password": hashed}}
+    )
+    return jsonify({"message": "Password updated successfully"})
