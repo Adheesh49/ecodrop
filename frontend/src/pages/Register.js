@@ -5,6 +5,16 @@ import "../styles/auth.css";
 
 const API = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
+const SECURITY_QUESTIONS = [
+  "What was the name of your first pet?",
+  "What is your mother's maiden name?",
+  "What was the name of your primary school?",
+  "What city were you born in?",
+  "What was your childhood nickname?",
+  "What is the name of your favourite childhood friend?",
+  "What street did you grow up on?",
+];
+
 function Register() {
   const navigate = useNavigate();
 
@@ -12,26 +22,24 @@ function Register() {
     name: "",
     email: "",
     phone: "",
-    password: ""
+    password: "",
+    securityQuestion: "",
+    securityAnswer: ""
   });
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleRegister = async () => {
-    try {
-      const response = await axios.post(
-        `${API}/register`,
-        formData
-      );
+    if (!formData.securityQuestion || !formData.securityAnswer) {
+      return alert("Please select a security question and provide an answer.");
+    }
 
+    try {
+      const response = await axios.post(`${API}/register`, formData);
       alert(response.data.message);
       navigate("/login");
-
     } catch (error) {
       if (error.response) {
         alert(error.response.data.message);
@@ -96,6 +104,31 @@ function Register() {
             type="password"
             name="password"
             placeholder="Enter your password"
+            onChange={handleChange}
+            onKeyDown={handleKeyDown}
+          />
+        </div>
+
+        <div className="auth-field">
+          <label>Security Question</label>
+          <select
+            name="securityQuestion"
+            onChange={handleChange}
+            value={formData.securityQuestion}
+            className="auth-select"
+          >
+            <option value="">Select a security question</option>
+            {SECURITY_QUESTIONS.map(q => (
+              <option key={q} value={q}>{q}</option>
+            ))}
+          </select>
+        </div>
+
+        <div className="auth-field">
+          <label>Security Answer</label>
+          <input
+            name="securityAnswer"
+            placeholder="Your answer (case insensitive)"
             onChange={handleChange}
             onKeyDown={handleKeyDown}
           />

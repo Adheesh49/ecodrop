@@ -221,6 +221,158 @@
   color: #1a6640;
 }
 
+
+/* ── FORGOT PASSWORD ─────────────────────────────────── */
+
+.auth-forgot-btn {
+  background: none;
+  border: none;
+  color: #22a348;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 8px;
+  font-family: 'Nunito', sans-serif;
+  text-align: center;
+  width: 100%;
+  padding: 4px 0;
+  transition: opacity 0.2s;
+}
+
+.auth-forgot-btn:hover { opacity: 0.7; }
+
+.forgot-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.forgot-back {
+  background: none;
+  border: none;
+  color: #22a348;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Nunito', sans-serif;
+  padding: 0;
+}
+
+.forgot-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: #111;
+  margin: 0;
+}
+
+.forgot-steps {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.forgot-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.forgot-step span {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #e0e0e0;
+  color: #888;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  transition: all 0.3s;
+}
+
+.forgot-step.active span {
+  background: #22a348;
+  color: white;
+}
+
+.forgot-step label {
+  font-size: 10px;
+  color: #888;
+  font-weight: 600;
+}
+
+.forgot-step.active label { color: #22a348; }
+
+.forgot-step-line {
+  width: 40px;
+  height: 2px;
+  background: #e0e0e0;
+  margin-bottom: 14px;
+}
+
+.forgot-desc {
+  font-size: 13px;
+  color: #888;
+  margin: 0 0 14px 0;
+  line-height: 1.5;
+}
+
+.forgot-question-box {
+  background: #f0fdf4;
+  border: 1px solid #22a348;
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 13px;
+  color: #1a5c2e;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.forgot-error {
+  background: #fff0f0;
+  color: #ef4444;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 10px 14px;
+  border-radius: 8px;
+  margin: 0 0 12px 0;
+  border: 1px solid #fca5a5;
+}
+
+.forgot-success {
+  text-align: center;
+  padding: 20px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.forgot-success span { font-size: 48px; }
+.forgot-success h3 { font-size: 20px; font-weight: 800; color: #22a348; margin: 0; }
+.forgot-success p { font-size: 14px; color: #555; margin: 0; }
+
+.auth-select {
+  width: 100%;
+  padding: 12px 14px;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: 'Nunito', sans-serif;
+  color: #333;
+  background: white;
+  outline: none;
+  transition: border-color 0.2s;
+  cursor: pointer;
+}
+
+.auth-select:focus { border-color: #22a348; }
+
 /* ── EDIT: Dark mode overrides ────────────────────────────
    All rules below activate when body has .dark-mode class  */
 
