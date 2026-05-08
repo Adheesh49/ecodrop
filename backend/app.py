@@ -5,14 +5,12 @@ from utils.db import users
 import bcrypt
 import os
 from routes.admin import admin_bp
-from routes.ai_search import ai_bp
 
 from routes.items import items_bp
 from routes.messages import messages_bp, register_socket_events
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "ecodrop-secret-key")
-app.register_blueprint(ai_bp)
 
 # FIX: use exact Vercel URL instead of wildcard
 CORS(app, resources={r"/*": {"origins": [

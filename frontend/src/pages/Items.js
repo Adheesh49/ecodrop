@@ -2,7 +2,7 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import DashboardLayout from "../layouts/DashboardLayout";
 import "./Items.css";
-import { aiTextSearch, aiImageSearch } from "../utils/aiSearch";
+import Fuse from "fuse.js";
 
 const API = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
@@ -16,6 +16,120 @@ const conditionStyle = {
   fair:      { color: "#d97706", background: "#fef3c7" },
   worn:      { color: "#dc2626", background: "#fee2e2" },
 };
+
+// ── SYNONYM MAP ───────────────────────────────────────────
+const SYNONYMS = {
+  mobile:     ["phone", "iphone", "samsung", "smartphone", "android", "cell"],
+  phone:      ["mobile", "iphone", "samsung", "smartphone", "cell"],
+  iphone:     ["phone", "mobile", "apple", "smartphone"],
+  samsung:    ["phone", "mobile", "android", "smartphone"],
+  laptop:     ["computer", "macbook", "notebook", "chromebook", "dell", "hp"],
+  computer:   ["laptop", "pc", "desktop", "macbook"],
+  macbook:    ["laptop", "apple", "computer", "notebook"],
+  tv:         ["television", "screen", "monitor", "display"],
+  television: ["tv", "screen", "monitor"],
+  fridge:     ["refrigerator", "freezer"],
+  refrigerator: ["fridge", "freezer"],
+  sofa:       ["couch", "lounge", "settee"],
+  couch:      ["sofa", "lounge", "settee"],
+  lounge:     ["sofa", "couch", "settee"],
+  shoes:      ["sneakers", "boots", "sandals", "trainers", "footwear"],
+  sneakers:   ["shoes", "trainers", "runners", "nikes", "adidas"],
+  boots:      ["shoes", "footwear"],
+  jacket:     ["coat", "hoodie", "jumper", "sweater", "parka", "blazer"],
+  coat:       ["jacket", "parka", "overcoat"],
+  hoodie:     ["jacket", "sweater", "jumper"],
+  bike:       ["bicycle", "cycling", "bmx"],
+  bicycle:    ["bike", "cycling"],
+  table:      ["desk", "dining table", "coffee table"],
+  desk:       ["table", "workstation"],
+  chair:      ["seat", "stool", "armchair", "recliner"],
+  bed:        ["mattress", "bedframe", "bunk"],
+  shelf:      ["bookshelf", "shelving", "rack", "bookcase"],
+  wardrobe:   ["closet", "cupboard", "cabinet"],
+  book:       ["novel", "textbook", "magazine", "comic"],
+  novel:      ["book", "fiction", "story"],
+  textbook:   ["book", "study", "academic"],
+  headphones: ["earphones", "earbuds", "airpods", "headset"],
+  earphones:  ["headphones", "earbuds", "airpods"],
+  camera:     ["dslr", "photography", "webcam", "gopro"],
+  tablet:     ["ipad", "kindle", "android tablet"],
+  ipad:       ["tablet", "apple"],
+  washing:    ["washer", "laundry", "washing machine"],
+  kettle:     ["jug", "electric kettle"],
+  blender:    ["mixer", "juicer", "food processor"],
+  coffee:     ["espresso", "nespresso", "coffee maker", "coffee machine"],
+  gym:        ["weights", "dumbbell", "barbell", "fitness"],
+  ball:       ["football", "basketball", "soccer", "tennis"],
+  football:   ["soccer", "ball", "rugby"],
+  basketball: ["ball", "hoop", "nba"],
+  scooter:    ["electric scooter", "kick scooter"],
+  skateboard: ["skate", "longboard"],
+  yoga:       ["mat", "pilates", "meditation"],
+  pot:        ["pan", "saucepan", "wok", "casserole"],
+  pan:        ["pot", "frying pan", "skillet", "wok"],
+  knife:      ["blade", "cutter", "chopper"],
+  toaster:    ["grill", "toaster oven"],
+  microwave:  ["oven", "microwave oven"],
+  shirt:      ["top", "tshirt", "tee", "blouse", "polo"],
+  pants:      ["jeans", "trousers", "shorts", "leggings"],
+  jeans:      ["pants", "denim", "trousers"],
+  dress:      ["skirt", "gown", "frock"],
+  hat:        ["cap", "beanie", "helmet"],
+};
+
+function expandQuery(query) {
+  const lower = query.toLowerCase().trim();
+  const terms = new Set([lower]);
+
+  if (SYNONYMS[lower]) {
+    SYNONYMS[lower].forEach(s => terms.add(s));
+  }
+
+  Object.entries(SYNONYMS).forEach(([key, list]) => {
+    if (list.includes(lower)) {
+      terms.add(key);
+      list.forEach(s => terms.add(s));
+    }
+  });
+
+  return Array.from(terms);
+}
+
+const fuseOptions = {
+  keys: [
+    { name: "title",       weight: 0.4 },
+    { name: "description", weight: 0.3 },
+    { name: "category",    weight: 0.15 },
+    { name: "tags",        weight: 0.1 },
+    { name: "location",    weight: 0.05 },
+  ],
+  threshold: 0.4,
+  includeScore: true,
+  minMatchCharLength: 2,
+  ignoreLocation: true,
+};
+
+function smartSearch(items, query) {
+  if (!query || query.trim() === "") return null;
+
+  const expandedTerms = expandQuery(query.trim());
+  const fuse = new Fuse(items, fuseOptions);
+  const resultMap = new Map();
+
+  expandedTerms.forEach(term => {
+    fuse.search(term).forEach(({ item, score }) => {
+      const existing = resultMap.get(item._id);
+      if (!existing || score < existing.score) {
+        resultMap.set(item._id, { item, score });
+      }
+    });
+  });
+
+  return Array.from(resultMap.values())
+    .sort((a, b) => a.score - b.score)
+    .map(r => r.item);
+}
 
 function timeAgo(ts) {
   if (!ts) return "";
@@ -37,17 +151,13 @@ function Items({ toggleDarkMode }) {
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [liked, setLiked] = useState({});
   const [loading, setLoading] = useState(true);
+  const [searchResults, setSearchResults] = useState(null);
 
   const [showMsgModal, setShowMsgModal] = useState(false);
   const [msgTarget, setMsgTarget] = useState(null);
   const [msgText, setMsgText] = useState("");
   const [msgSent, setMsgSent] = useState(false);
   const [sending, setSending] = useState(false);
-
-  // AI search state
-  const [aiSearching, setAiSearching] = useState(false);
-  const [aiResults, setAiResults] = useState(null);
-  const [imgSearch, setImgSearch] = useState(false);
 
   const loaderRef = useRef(null);
 
@@ -76,55 +186,28 @@ function Items({ toggleDarkMode }) {
     return () => observer.disconnect();
   }, [handleObserver]);
 
-  // AI text search handler with 600ms debounce
-  const handleSearch = async (e) => {
+  // Smart search handler — instant with Fuse.js
+  const handleSearch = (e) => {
     const value = e.target.value;
     setSearch(value);
     setVisibleCount(PAGE_SIZE);
 
     if (!value.trim()) {
-      setAiResults(null);
+      setSearchResults(null);
       return;
     }
 
-    clearTimeout(window._searchTimer);
-    window._searchTimer = setTimeout(async () => {
-      setAiSearching(true);
-      const results = await aiTextSearch(items, value);
-      setAiResults(results);
-      setAiSearching(false);
-    }, 600);
+    const results = smartSearch(items, value);
+    setSearchResults(results);
   };
 
-  // AI image search handler
-  const handleImageSearch = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    setImgSearch(true);
-    setAiSearching(true);
+  const clearSearch = () => {
     setSearch("");
-    setAiResults(null);
-
-    const reader = new FileReader();
-    reader.onload = async (ev) => {
-      const base64 = ev.target.result;
-      const mediaType = file.type;
-      const results = await aiImageSearch(items, base64, mediaType);
-      setAiResults(results);
-      setAiSearching(false);
-    };
-    reader.readAsDataURL(file);
+    setSearchResults(null);
+    setVisibleCount(PAGE_SIZE);
   };
 
-  const clearImageSearch = () => {
-    setImgSearch(false);
-    setAiResults(null);
-    setSearch("");
-  };
-
-  // Use AI results if available, otherwise use all items
-  const filtered = (aiResults !== null ? aiResults : items).filter(item =>
+  const filtered = (searchResults !== null ? searchResults : items).filter(item =>
     category === "All" || item.category === category
   );
 
@@ -182,44 +265,21 @@ function Items({ toggleDarkMode }) {
         {/* ── TOP BAR ── */}
         <div className="items-topbar">
           <div className="items-search-wrap">
-            <span className="search-icon">
-              {aiSearching ? "⏳" : imgSearch ? "🖼️" : "🔍"}
-            </span>
-            {imgSearch ? (
-              <div className="img-search-active">
-                <span>
-                  {aiSearching ? "AI is analysing your image..." : "Showing results for your image"}
-                </span>
-                <button className="img-search-clear" onClick={clearImageSearch}>
-                  ✕ Clear
-                </button>
-              </div>
-            ) : (
-              <input
-                className="items-search"
-                type="text"
-                placeholder="Search items... (AI-powered 🤖)"
-                value={search}
-                onChange={handleSearch}
-              />
+            <span className="search-icon">🔍</span>
+            <input
+              className="items-search"
+              type="text"
+              placeholder="Smart search — try 'mobile', 'sofa', 'laptop'..."
+              value={search}
+              onChange={handleSearch}
+            />
+            {search && (
+              <button className="search-clear-btn" onClick={clearSearch}>✕</button>
             )}
           </div>
-
-          {/* IMAGE SEARCH BUTTON */}
-          <label className="img-search-btn" title="Search by image">
-            📷
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleImageSearch}
-              style={{ display: "none" }}
-            />
-          </label>
-
           <button className="add-item-btn" onClick={() => navigate("/add-item")}>
             + Add Item
           </button>
-
           <div className="view-toggle">
             <button
               className={viewMode === "grid" ? "active" : ""}
@@ -247,10 +307,8 @@ function Items({ toggleDarkMode }) {
         <p className="results-count">
           {loading
             ? "Loading..."
-            : aiSearching
-            ? "🤖 AI is searching..."
-            : aiResults !== null
-            ? `🤖 AI found ${filtered.length} item${filtered.length !== 1 ? "s" : ""} for "${search || "your image"}"`
+            : searchResults !== null
+            ? `🔍 Found ${filtered.length} item${filtered.length !== 1 ? "s" : ""} for "${search}"`
             : `${filtered.length} item${filtered.length !== 1 ? "s" : ""} available`
           }
         </p>
@@ -262,16 +320,13 @@ function Items({ toggleDarkMode }) {
           <div className="items-empty">
             <span>🌿</span>
             <p>
-              {aiResults !== null
-                ? "No items matched your search. Try different keywords or an image."
+              {searchResults !== null
+                ? `No items found for "${search}". Try a different keyword.`
                 : "No items found. Be the first to share something!"
               }
             </p>
-            {aiResults !== null ? (
-              <button
-                className="add-item-btn"
-                onClick={() => { setAiResults(null); setSearch(""); setImgSearch(false); }}
-              >
+            {searchResults !== null ? (
+              <button className="add-item-btn" onClick={clearSearch}>
                 Clear Search
               </button>
             ) : (
@@ -324,14 +379,20 @@ function Items({ toggleDarkMode }) {
                     <p className="item-desc">{item.description}</p>
 
                     <div className="item-meta-row">
-                      {item.location && <span className="item-meta">📍 {item.location}</span>}
-                      {item.createdAt && <span className="item-meta">🕐 {timeAgo(item.createdAt)}</span>}
+                      {item.location && (
+                        <span className="item-meta">📍 {item.location}</span>
+                      )}
+                      {item.createdAt && (
+                        <span className="item-meta">🕐 {timeAgo(item.createdAt)}</span>
+                      )}
                     </div>
 
                     <div className="item-owner-row">
                       <span className="item-owner-icon">👤</span>
                       <span className="item-owner-name">{item.owner}</span>
-                      {isOwner && <span className="item-yours-badge">Your item</span>}
+                      {isOwner && (
+                        <span className="item-yours-badge">Your item</span>
+                      )}
                     </div>
 
                     <div className="item-actions">
@@ -440,7 +501,11 @@ function Items({ toggleDarkMode }) {
                   <button className="modal-cancel" onClick={() => setShowMsgModal(false)}>
                     Cancel
                   </button>
-                  <button className="modal-submit" onClick={handleSendMsg} disabled={sending}>
+                  <button
+                    className="modal-submit"
+                    onClick={handleSendMsg}
+                    disabled={sending}
+                  >
                     {sending ? "Sending..." : "Send 💬"}
                   </button>
                 </>
