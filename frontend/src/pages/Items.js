@@ -159,6 +159,22 @@ function Items({ toggleDarkMode }) {
   const [msgSent, setMsgSent] = useState(false);
   const [sending, setSending] = useState(false);
 
+  // Order modal state
+  const [showOrderModal, setShowOrderModal] = useState(false);
+  const [orderItem, setOrderItem] = useState(null);
+  const [deliveryType, setDeliveryType] = useState(null); // "delivery" or "self-collect"
+  const [orderStep, setOrderStep] = useState(1); // 1=choose type, 2=address form, 3=confirm
+  const [orderForm, setOrderForm] = useState({
+    streetNumber: "",
+    street: "",
+    suburb: "",
+    state: "",
+    postcode: "",
+    phone: ""
+  });
+  const [orderPlaced, setOrderPlaced] = useState(false);
+  const [placingOrder, setPlacingOrder] = useState(false);
+
   const loaderRef = useRef(null);
 
   const fetchItems = async () => {
@@ -257,6 +273,50 @@ function Items({ toggleDarkMode }) {
   };
 
   const condKey = (c) => c?.toLowerCase() || "good";
+
+  const openOrderModal = (e, item) => {
+    e.stopPropagation();
+    setOrderItem(item);
+    setDeliveryType(null);
+    setOrderStep(1);
+    setOrderForm({ streetNumber: "", street: "", suburb: "", state: "", postcode: "", phone: "" });
+    setOrderPlaced(false);
+    setShowOrderModal(true);
+  };
+
+  const handleOrderFormChange = (e) => {
+      setOrderForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handlePlaceOrder = async () => {
+    if (deliveryType === "delivery") {
+      const { streetNumber, street, suburb, state, postcode, phone } = orderForm;
+      if (!streetNumber || !street || !suburb || !state || !postcode || !phone) {
+        return alert("Please fill in all delivery details.");
+    }
+  }
+
+  setPlacingOrder(true);
+  try {
+    await fetch(`${API}/orders`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        itemId: orderItem._id,
+        itemTitle: orderItem.title,
+        itemOwner: orderItem.owner,
+        requestedBy: currentUser,
+        deliveryType,
+        address: deliveryType === "delivery" ? orderForm : {},
+        phone: deliveryType === "delivery" ? orderForm.phone : ""
+      })
+    });
+    setOrderPlaced(true);
+  } catch {
+    alert("Failed to place order. Please try again.");
+  }
+  setPlacingOrder(false);
+};
 
   return (
     <DashboardLayout toggleDarkMode={toggleDarkMode}>
@@ -432,7 +492,14 @@ function Items({ toggleDarkMode }) {
                     <div className="item-footer">
                       <span>{item.views || 0} views</span>
                       <span>{item.likes || 0} likes</span>
-                      <span className="item-eco-tag">📦 Eco-Delivery</span>
+                      {!isOwner && (
+                        <button
+                          className="item-order-btn"
+                          onClick={(e) => openOrderModal(e, item)}
+                        >
+                          🛒 Place an Order
+                        </button>
+                      )}
                     </div>
 
                   </div>
@@ -514,6 +581,195 @@ function Items({ toggleDarkMode }) {
           </div>
         </div>
       )}
+
+      {/* ── ORDER MODAL ── */}
+{showOrderModal && (
+  <div className="modal-overlay" onClick={() => setShowOrderModal(false)}>
+    <div className="modal order-modal" onClick={e => e.stopPropagation()}>
+      <div className="modal-header">
+        <h2>🛒 Place an Order</h2>
+        <button className="modal-close" onClick={() => setShowOrderModal(false)}>✕</button>
+      </div>
+
+      <div className="modal-body">
+        {orderPlaced ? (
+          <div className="order-success">
+            <span>✅</span>
+            <h3>Order Placed!</h3>
+            <p>Your order for <strong>{orderItem?.title}</strong> has been placed.</p>
+            {deliveryType === "delivery" ? (
+              <p className="order-success-note">
+                🚴 A courier will be assigned soon. You can track your order in <strong>My Orders</strong>.
+              </p>
+            ) : (
+              <p className="order-success-note">
+                📍 The owner has been notified. You can collect the item at their location.
+              </p>
+            )}
+            <button
+              className="auth-btn"
+              style={{ marginTop: "12px" }}
+              onClick={() => {
+                setShowOrderModal(false);
+                if (deliveryType === "delivery") navigate("/my-orders");
+              }}
+            >
+              {deliveryType === "delivery" ? "Track My Order →" : "Close"}
+            </button>
+          </div>
+        ) : (
+          <>
+            {/* STEP 1 — CHOOSE DELIVERY TYPE */}
+            {orderStep === 1 && (
+              <div className="order-step">
+                <div className="order-item-preview">
+                  <div className="order-item-thumb">
+                    {orderItem?.images?.[0]
+                      ? <img src={orderItem.images[0]} alt={orderItem.title} />
+                      : <span>📦</span>
+                    }
+                  </div>
+                  <div>
+                    <strong>{orderItem?.title}</strong>
+                    <span>{orderItem?.category} · {orderItem?.condition}</span>
+                    <span>👤 {orderItem?.owner}</span>
+                  </div>
+                </div>
+
+                <p className="order-question">How would you like to receive this item?</p>
+
+                <div className="order-type-cards">
+                  <div
+                    className={`order-type-card ${deliveryType === "delivery" ? "selected" : ""}`}
+                    onClick={() => setDeliveryType("delivery")}
+                  >
+                    <span>🚴</span>
+                    <strong>Home Delivery</strong>
+                    <p>A courier will pick up and deliver the item to your address.</p>
+                  </div>
+                  <div
+                    className={`order-type-card ${deliveryType === "self-collect" ? "selected" : ""}`}
+                    onClick={() => setDeliveryType("self-collect")}
+                  >
+                    <span>🚶</span>
+                    <strong>Self Collection</strong>
+                    <p>You collect the item directly from the owner's location.</p>
+                  </div>
+                </div>
+
+                {deliveryType && (
+                  <button
+                    className="auth-btn"
+                    style={{ marginTop: "16px" }}
+                    onClick={() => {
+                      if (deliveryType === "self-collect") {
+                        handlePlaceOrder();
+                      } else {
+                        setOrderStep(2);
+                      }
+                    }}
+                  >
+                    {deliveryType === "delivery" ? "Enter Delivery Details →" : "Confirm Order →"}
+                  </button>
+                )}
+              </div>
+            )}
+
+            {/* STEP 2 — DELIVERY ADDRESS */}
+            {orderStep === 2 && (
+              <div className="order-step">
+                <p className="order-question">📍 Enter your delivery address</p>
+
+                <div className="order-address-grid">
+                  <div className="auth-field" style={{ gridColumn: "1" }}>
+                    <label>Street Number</label>
+                    <input
+                      name="streetNumber"
+                      placeholder="e.g. 42"
+                      value={orderForm.streetNumber}
+                      onChange={handleOrderFormChange}
+                    />
+                  </div>
+                  <div className="auth-field" style={{ gridColumn: "2" }}>
+                    <label>Street Name</label>
+                    <input
+                      name="street"
+                      placeholder="e.g. George Street"
+                      value={orderForm.street}
+                      onChange={handleOrderFormChange}
+                    />
+                  </div>
+                  <div className="auth-field" style={{ gridColumn: "1" }}>
+                    <label>Suburb</label>
+                    <input
+                      name="suburb"
+                      placeholder="e.g. Sydney"
+                      value={orderForm.suburb}
+                      onChange={handleOrderFormChange}
+                    />
+                  </div>
+                  <div className="auth-field" style={{ gridColumn: "2" }}>
+                    <label>State</label>
+                    <select
+                      name="state"
+                      value={orderForm.state}
+                      onChange={handleOrderFormChange}
+                      className="auth-select"
+                    >
+                      <option value="">Select state</option>
+                      <option>NSW</option>
+                      <option>VIC</option>
+                      <option>QLD</option>
+                      <option>WA</option>
+                      <option>SA</option>
+                      <option>TAS</option>
+                      <option>ACT</option>
+                      <option>NT</option>
+                    </select>
+                  </div>
+                  <div className="auth-field" style={{ gridColumn: "1" }}>
+                    <label>Postcode</label>
+                    <input
+                      name="postcode"
+                      placeholder="e.g. 2000"
+                      value={orderForm.postcode}
+                      onChange={handleOrderFormChange}
+                    />
+                  </div>
+                  <div className="auth-field" style={{ gridColumn: "2" }}>
+                    <label>Phone Number</label>
+                    <input
+                      name="phone"
+                      placeholder="e.g. 0412 345 678"
+                      value={orderForm.phone}
+                      onChange={handleOrderFormChange}
+                    />
+                  </div>
+                </div>
+
+                <div className="order-nav-btns">
+                  <button
+                    className="modal-cancel"
+                    onClick={() => setOrderStep(1)}
+                  >
+                    ← Back
+                  </button>
+                  <button
+                    className="auth-btn"
+                    onClick={handlePlaceOrder}
+                    disabled={placingOrder}
+                  >
+                    {placingOrder ? "Placing Order..." : "Confirm Order →"}
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </div>
+  </div>
+)}
 
     </DashboardLayout>
   );

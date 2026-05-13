@@ -5,9 +5,11 @@ from utils.db import users
 import bcrypt
 import os
 from routes.admin import admin_bp
+from routes.orders import orders_bp
 
 from routes.items import items_bp
 from routes.messages import messages_bp, register_socket_events
+
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "ecodrop-secret-key")
@@ -28,6 +30,7 @@ socketio = SocketIO(app, cors_allowed_origins=[
 app.register_blueprint(items_bp)
 app.register_blueprint(messages_bp)
 app.register_blueprint(admin_bp)
+app.register_blueprint(orders_bp)
 
 # REGISTER WEBSOCKET EVENT HANDLERS
 register_socket_events(socketio)
@@ -52,14 +55,10 @@ def register():
     if not name or not email or not password:
         return jsonify({"message": "Missing fields"}), 400
 
-    if not security_question or not security_answer:
-        return jsonify({"message": "Security question and answer are required"}), 400
-
     if users.find_one({"email": email}):
         return jsonify({"message": "User already exists"}), 400
 
     hashed_password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
-    hashed_answer = bcrypt.hashpw(security_answer.encode("utf-8"), bcrypt.gensalt())
 
     new_user = {
         "name": name,
@@ -68,8 +67,12 @@ def register():
         "password": hashed_password,
         "role": "user",
         "securityQuestion": security_question,
-        "securityAnswer": hashed_answer
     }
+
+    # Only hash and store answer if provided
+    if security_answer:
+        hashed_answer = bcrypt.hashpw(security_answer.encode("utf-8"), bcrypt.gensalt())
+        new_user["securityAnswer"] = hashed_answer
 
     users.insert_one(new_user)
     return jsonify({"message": "Registration successful"})

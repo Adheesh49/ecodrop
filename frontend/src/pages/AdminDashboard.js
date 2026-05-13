@@ -23,6 +23,14 @@ function AdminDashboard({ toggleDarkMode }) {
   const [resetMsg, setResetMsg] = useState("");
   const [resetting, setResetting] = useState(false);
 
+  // Orders & Courier state
+  const [orders, setOrders] = useState([]);
+  const [couriers, setCouriers] = useState([]);
+  const [assignModal, setAssignModal] = useState(false);
+  const [assignOrder, setAssignOrder] = useState(null);
+  const [selectedCourier, setSelectedCourier] = useState("");
+  const [assignMsg, setAssignMsg] = useState("");
+
   useEffect(() => {
     if (role !== "admin") navigate("/dashboard");
   }, [role, navigate]);
@@ -33,18 +41,30 @@ function AdminDashboard({ toggleDarkMode }) {
 
   const fetchAll = async () => {
     setLoading(true);
-    try {
-      const [uRes, iRes] = await Promise.all([
-        fetch(`${API}/admin/users`),
-        fetch(`${API}/admin/items`)
-      ]);
-      const uData = await uRes.json();
-      const iData = await iRes.json();
-      setUsers(Array.isArray(uData) ? uData : []);
-      setItems(Array.isArray(iData) ? iData : []);
-    } catch (e) {
-      console.error("Failed to fetch admin data:", e);
-    }
+
+    const safeFetch = async (url) => {
+      try {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`Status: ${res.status}`);
+        const data = await res.json();
+        return Array.isArray(data) ? data : [];
+      } catch (e) {
+        console.error(`Error fetching ${url}:`, e);
+        return [];
+      }
+    };
+
+    const [uData, iData, oData, cData] = await Promise.all([
+      safeFetch(`${API}/admin/users`),
+      safeFetch(`${API}/admin/items`),
+      safeFetch(`${API}/admin/orders`),
+      safeFetch(`${API}/admin/couriers`)
+    ]);
+
+    setUsers(uData);
+    setItems(iData);
+    setOrders(oData);
+    setCouriers(cData);
     setLoading(false);
   };
 
@@ -85,6 +105,31 @@ function AdminDashboard({ toggleDarkMode }) {
     setNewPassword("");
     setResetMsg("");
     setResetModal(true);
+  };
+
+  const handleRoleChange = async (userId, newRole) => {
+    await fetch(`${API}/admin/users/${userId}/role`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ role: newRole })
+    });
+    fetchAll();
+  };
+
+  const handleAssignCourier = async () => {
+    const courier = couriers.find(c => c.name === selectedCourier);
+    if (!courier) return;
+    await fetch(`${API}/orders/${assignOrder._id}/assign`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        courierId: courier._id,
+        courierName: courier.name
+      })
+    });
+    setAssignMsg("Courier assigned successfully!");
+    fetchAll();
+    setTimeout(() => setAssignModal(false), 1500);
   };
 
   const filteredUsers = users.filter(u =>
@@ -131,15 +176,15 @@ function AdminDashboard({ toggleDarkMode }) {
             <span className="admin-stat-num">{stats.totalItems}</span>
             <span className="admin-stat-label">Total Items</span>
           </div>
-          <div className="admin-stat-box green">
-            <span className="admin-stat-icon">✅</span>
-            <span className="admin-stat-num">{stats.available}</span>
-            <span className="admin-stat-label">Available Items</span>
+          <div className="admin-stat-box green" onClick={() => setActiveTab("orders")}>
+            <span className="admin-stat-icon">🛒</span>
+            <span className="admin-stat-num">{orders.length}</span>
+            <span className="admin-stat-label">Total Orders</span>
           </div>
           <div className="admin-stat-box teal">
             <span className="admin-stat-icon">🚴</span>
-            <span className="admin-stat-num">{stats.ecoDelivery}</span>
-            <span className="admin-stat-label">Eco-Delivery</span>
+            <span className="admin-stat-num">{couriers.length}</span>
+            <span className="admin-stat-label">Couriers</span>
           </div>
           <div className="admin-stat-box amber">
             <span className="admin-stat-icon">🛡️</span>
@@ -167,14 +212,20 @@ function AdminDashboard({ toggleDarkMode }) {
           >
             📦 Items ({items.length})
           </button>
+          <button
+            className={`admin-tab ${activeTab === "orders" ? "active" : ""}`}
+            onClick={() => setActiveTab("orders")}
+          >
+            🛒 Orders ({orders.length})
+          </button>
         </div>
 
         {loading ? (
           <div className="admin-loading"><div className="admin-spinner" /></div>
         ) : activeTab === "users" ? (
 
+          /* ── USERS TABLE ── */
           <div className="admin-table-card">
-            {/* SEARCH */}
             <div className="admin-search-wrap">
               <span>🔍</span>
               <input
@@ -185,7 +236,6 @@ function AdminDashboard({ toggleDarkMode }) {
               <span className="admin-count">{filteredUsers.length} results</span>
             </div>
 
-            {/* USERS TABLE */}
             <div className="admin-table-wrap">
               <table className="admin-table">
                 <thead>
@@ -211,9 +261,16 @@ function AdminDashboard({ toggleDarkMode }) {
                       <td>{user.email}</td>
                       <td>{user.phone || "—"}</td>
                       <td>
-                        <span className={`admin-role-badge ${user.role}`}>
-                          {user.role}
-                        </span>
+                        {/* ROLE SELECT — changes user role instantly */}
+                        <select
+                          className="admin-role-select"
+                          value={user.role || "user"}
+                          onChange={(e) => handleRoleChange(user._id, e.target.value)}
+                        >
+                          <option value="user">👤 User</option>
+                          <option value="courier">🚴 Courier</option>
+                          <option value="admin">🛡️ Admin</option>
+                        </select>
                       </td>
                       <td>
                         <div className="admin-action-btns">
@@ -238,10 +295,10 @@ function AdminDashboard({ toggleDarkMode }) {
             </div>
           </div>
 
-        ) : (
+        ) : activeTab === "items" ? (
 
+          /* ── ITEMS TABLE ── */
           <div className="admin-table-card">
-            {/* SEARCH */}
             <div className="admin-search-wrap">
               <span>🔍</span>
               <input
@@ -252,7 +309,6 @@ function AdminDashboard({ toggleDarkMode }) {
               <span className="admin-count">{filteredItems.length} results</span>
             </div>
 
-            {/* ITEMS TABLE */}
             <div className="admin-table-wrap">
               <table className="admin-table">
                 <thead>
@@ -308,10 +364,82 @@ function AdminDashboard({ toggleDarkMode }) {
             </div>
           </div>
 
+        ) : (
+
+          /* ── ORDERS TABLE ── */
+          <div className="admin-table-card">
+            <div className="admin-search-wrap">
+              <span>📋</span>
+              <span style={{ fontSize: "14px", fontWeight: "700", color: "#333" }}>
+                All Orders — {orders.length} total
+              </span>
+            </div>
+            <div className="admin-table-wrap">
+              <table className="admin-table">
+                <thead>
+                  <tr>
+                    <th>Item</th>
+                    <th>Ordered By</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                    <th>Courier</th>
+                    <th>Address</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {orders.length === 0 ? (
+                    <tr>
+                      <td colSpan="7" style={{ textAlign: "center", padding: "30px", color: "#888" }}>
+                        No orders yet
+                      </td>
+                    </tr>
+                  ) : orders.map(order => (
+                    <tr key={order._id}>
+                      <td><strong>{order.itemTitle}</strong></td>
+                      <td>{order.requestedBy}</td>
+                      <td>
+                        <span className={`admin-role-badge ${order.deliveryType === "delivery" ? "user" : "driver"}`}>
+                          {order.deliveryType === "delivery" ? "🚴 Delivery" : "🚶 Self-collect"}
+                        </span>
+                      </td>
+                      <td>
+                        <span className={`admin-status-badge ${order.status === "Delivered" ? "available" : "taken"}`}>
+                          {order.status}
+                        </span>
+                      </td>
+                      <td>{order.courierName || "—"}</td>
+                      <td>
+                        {order.address?.suburb
+                          ? `${order.address.suburb}, ${order.address.state}`
+                          : "—"
+                        }
+                      </td>
+                      <td>
+                        {order.deliveryType === "delivery" && order.status !== "Delivered" && (
+                          <button
+                            className="admin-reset-btn"
+                            onClick={() => {
+                              setAssignOrder(order);
+                              setSelectedCourier("");
+                              setAssignMsg("");
+                              setAssignModal(true);
+                            }}
+                          >
+                            🚴 Assign Courier
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
         )}
       </div>
 
-      {/* PASSWORD RESET MODAL */}
+      {/* ── PASSWORD RESET MODAL ── */}
       {resetModal && (
         <div className="modal-overlay" onClick={() => setResetModal(false)}>
           <div className="modal" onClick={e => e.stopPropagation()}>
@@ -354,6 +482,74 @@ function AdminDashboard({ toggleDarkMode }) {
                 disabled={resetting}
               >
                 {resetting ? "Resetting..." : "🔑 Reset Password"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── ASSIGN COURIER MODAL ── */}
+      {assignModal && (
+        <div className="modal-overlay" onClick={() => setAssignModal(false)}>
+          <div className="modal" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>🚴 Assign Courier</h2>
+              <button className="modal-close" onClick={() => setAssignModal(false)}>✕</button>
+            </div>
+            <div className="modal-body">
+              <div className="admin-reset-user-info">
+                <div className="admin-avatar large">📦</div>
+                <div>
+                  <strong>{assignOrder?.itemTitle}</strong>
+                  <span>Ordered by: {assignOrder?.requestedBy}</span>
+                  {assignOrder?.address?.suburb && (
+                    <span>
+                      📍 {assignOrder.address.streetNumber} {assignOrder.address.street},{" "}
+                      {assignOrder.address.suburb} {assignOrder.address.state}{" "}
+                      {assignOrder.address.postcode}
+                    </span>
+                  )}
+                  {assignOrder?.phone && (
+                    <span>📞 {assignOrder.phone}</span>
+                  )}
+                </div>
+              </div>
+              <label>Select Courier</label>
+              {couriers.length === 0 ? (
+                <p style={{ color: "#ef4444", fontSize: "13px", marginTop: "8px" }}>
+                  ⚠️ No couriers registered yet. Go to Users tab and change a user's role to Courier first.
+                </p>
+              ) : (
+                <select
+                  className="auth-select"
+                  value={selectedCourier}
+                  onChange={e => setSelectedCourier(e.target.value)}
+                  style={{ marginTop: "8px" }}
+                >
+                  <option value="">Choose a courier...</option>
+                  {couriers.map(c => (
+                    <option key={c._id} value={c.name}>
+                      {c.name} ({c.email})
+                    </option>
+                  ))}
+                </select>
+              )}
+              {assignMsg && (
+                <p className={`admin-reset-msg ${assignMsg.includes("success") ? "success" : "error"}`}>
+                  {assignMsg}
+                </p>
+              )}
+            </div>
+            <div className="modal-footer">
+              <button className="modal-cancel" onClick={() => setAssignModal(false)}>
+                Cancel
+              </button>
+              <button
+                className="modal-submit"
+                disabled={!selectedCourier}
+                onClick={handleAssignCourier}
+              >
+                ✅ Assign Courier
               </button>
             </div>
           </div>

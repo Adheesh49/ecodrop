@@ -1,0 +1,283 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
+
+.myorders-page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 30px 20px;
+  font-family: 'Nunito', sans-serif;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.myorders-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.myorders-back {
+  background: none;
+  border: none;
+  color: #22a348;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: 'Nunito', sans-serif;
+  cursor: pointer;
+  padding: 0;
+}
+
+.myorders-header h1 {
+  font-size: 26px;
+  font-weight: 800;
+  color: #111;
+  margin: 0 0 4px 0;
+}
+
+.myorders-header p { font-size: 14px; color: #888; margin: 0; }
+
+.myorders-layout {
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+@media (max-width: 768px) {
+  .myorders-layout { grid-template-columns: 1fr; }
+}
+
+/* ORDER LIST */
+.myorders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.myorder-card {
+  background: white;
+  border-radius: 14px;
+  padding: 16px;
+  border: 2px solid #e0e0e0;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.myorder-card:hover { border-color: #22a348; transform: translateY(-1px); }
+.myorder-card.active { border-color: #22a348; background: #f0fdf4; }
+
+.myorder-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.myorder-card-top div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.myorder-card-top strong { font-size: 15px; color: #111; }
+.myorder-card-top span { font-size: 12px; color: #888; }
+
+.myorder-status-badge {
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.myorder-status-badge.active { background: #dbeafe; color: #2563eb; }
+.myorder-status-badge.delivered { background: #dcfce7; color: #16a34a; }
+.myorder-status-badge.selfcollect { background: #fef3c7; color: #d97706; }
+
+.myorder-card-bottom {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 12px;
+  color: #888;
+}
+
+/* ORDER DETAIL */
+.myorder-detail {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+}
+
+.myorder-detail h2 {
+  font-size: 18px;
+  font-weight: 800;
+  color: #111;
+  margin: 0 0 16px 0;
+}
+
+.myorder-info-card {
+  background: #f9fafb;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.myorder-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  font-size: 14px;
+  gap: 10px;
+}
+
+.myorder-info-row span { color: #888; flex-shrink: 0; }
+.myorder-info-row strong { color: #111; text-align: right; }
+
+/* TRACKER */
+.myorder-tracker h3 {
+  font-size: 16px;
+  font-weight: 800;
+  color: #111;
+  margin: 0 0 16px 0;
+}
+
+.tracker-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.tracker-step {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.tracker-left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.tracker-dot {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #e0e0e0;
+  color: #999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  flex-shrink: 0;
+  transition: all 0.3s;
+  border: 2px solid #e0e0e0;
+}
+
+.tracker-dot.done {
+  background: #22a348;
+  color: white;
+  border-color: #22a348;
+}
+
+.tracker-dot.current {
+  background: white;
+  color: #22a348;
+  border-color: #22a348;
+  box-shadow: 0 0 0 4px rgba(34,163,72,0.15);
+}
+
+.tracker-line {
+  width: 2px;
+  height: 36px;
+  background: #e0e0e0;
+  margin: 4px 0;
+  transition: background 0.3s;
+}
+
+.tracker-line.done { background: #22a348; }
+
+.tracker-right {
+  padding: 4px 0 32px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.tracker-right strong { font-size: 14px; color: #aaa; font-weight: 700; }
+.tracker-right strong.done { color: #111; }
+.tracker-right span { font-size: 12px; color: #22a348; }
+
+/* SELF COLLECT */
+.myorder-selfcollect {
+  display: flex;
+  gap: 16px;
+  background: #fef3c7;
+  border-radius: 14px;
+  padding: 18px;
+  margin-top: 16px;
+}
+
+.myorder-selfcollect span { font-size: 32px; flex-shrink: 0; }
+.myorder-selfcollect strong { display: block; font-size: 15px; color: #92400e; margin-bottom: 6px; }
+.myorder-selfcollect p { font-size: 13px; color: #78350f; margin: 0 0 12px 0; line-height: 1.5; }
+
+.myorder-msg-btn {
+  padding: 10px 18px;
+  background: #22a348;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: 'Nunito', sans-serif;
+  cursor: pointer;
+}
+
+/* LOADING / EMPTY */
+.myorders-loading { display: flex; justify-content: center; padding: 60px; }
+.myorders-spinner {
+  width: 36px; height: 36px;
+  border: 3px solid #e0e0e0;
+  border-top-color: #22a348;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+.myorders-empty { text-align: center; padding: 60px; color: #888; }
+.myorders-empty span { font-size: 48px; display: block; margin-bottom: 12px; }
+.myorders-browse-btn {
+  margin-top: 16px;
+  padding: 12px 24px;
+  background: #22a348;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: 'Nunito', sans-serif;
+  cursor: pointer;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* DARK MODE */
+body.dark-mode .myorders-header h1 { color: #eee; }
+body.dark-mode .myorder-card { background: #1f2937; border-color: #374151; }
+body.dark-mode .myorder-card.active { background: #1a2e1f; border-color: #22a348; }
+body.dark-mode .myorder-card-top strong { color: #eee; }
+body.dark-mode .myorder-detail { background: #1f2937; border-color: #374151; }
+body.dark-mode .myorder-detail h2 { color: #eee; }
+body.dark-mode .myorder-info-card { background: #111; }
+body.dark-mode .myorder-info-row strong { color: #eee; }
+body.dark-mode .tracker-right strong.done { color: #eee; }
+body.dark-mode .myorder-tracker h3 { color: #eee; }

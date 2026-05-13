@@ -47,6 +47,8 @@ function DashboardHeader({ toggleDarkMode }) {
           <Link to="/add-item">Add Item</Link>
           <Link to="/messages">Messages</Link>
           <Link to="/courier">Courier</Link>
+          <Link to="/my-orders">My Orders</Link>
+
 
           {role === "admin" && (
             <Link to="/admin-dashboard">Admin</Link>

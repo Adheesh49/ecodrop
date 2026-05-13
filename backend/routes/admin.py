@@ -53,3 +53,13 @@ def reset_password(id):
         {"$set": {"password": hashed}}
     )
     return jsonify({"message": "Password updated successfully"})
+
+# PROMOTE USER TO COURIER
+@admin_bp.route("/admin/users/<id>/role", methods=["POST"])
+def update_role(id):
+    data = request.json
+    new_role = data.get("role")
+    if new_role not in ["user", "courier", "admin"]:
+        return jsonify({"message": "Invalid role"}), 400
+    users_col.update_one({"_id": ObjectId(id)}, {"$set": {"role": new_role}})
+    return jsonify({"message": f"Role updated to {new_role}"})

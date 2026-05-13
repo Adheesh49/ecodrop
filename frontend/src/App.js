@@ -12,6 +12,7 @@ import ItemDetail from "./pages/ItemDetail";
 import AddItem from "./pages/AddItem";
 import Messages from "./pages/Messages"; 
 import Courier from "./pages/Courier";
+import MyOrders from "./pages/MyOrders";
 
 // LAYOUT
 import Layout from "./components/Layout";
@@ -52,6 +53,8 @@ function App() {
           <Route path="/admin-dashboard" element={<AdminDashboard toggleDarkMode={toggleDarkMode} />} />
           <Route path="/admin-dashboard" element={<AdminDashboard toggleDarkMode={toggleDarkMode} />} />
           <Route path="/courier" element={<Courier toggleDarkMode={toggleDarkMode} />} /> 
+          <Route path="/my-orders" element={<MyOrders toggleDarkMode={toggleDarkMode} />} />
+
 
         </Routes>
       </div>

@@ -339,3 +339,118 @@ body.dark-mode .courier-msg-btn { background: #1a2e1f; }
   .courier-grid { grid-template-columns: 1fr; }
   .courier-hero-stats { gap: 12px; }
 }
+
+/* ── ORDER CARDS ── */
+.courier-orders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.courier-order-card {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  transition: box-shadow 0.2s;
+}
+
+.courier-order-card:hover {
+  box-shadow: 0 4px 16px rgba(34,163,72,0.12);
+}
+
+.courier-order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.courier-order-header div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.courier-order-header strong { font-size: 16px; color: #111; }
+.courier-order-header span { font-size: 13px; color: #888; }
+
+.courier-order-status {
+  padding: 5px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.courier-order-status.active { background: #dbeafe; color: #2563eb; }
+.courier-order-status.delivered { background: #dcfce7; color: #16a34a; }
+
+.courier-order-address {
+  background: #f9fafb;
+  border-radius: 10px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+}
+
+.courier-order-address span { color: #888; }
+.courier-order-address strong { color: #111; font-size: 14px; }
+
+.courier-order-meta {
+  display: flex;
+  gap: 16px;
+  font-size: 12px;
+  color: #aaa;
+}
+
+.courier-order-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.courier-claim-btn {
+  padding: 11px 20px;
+  background: #22a348;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: 'Nunito', sans-serif;
+  cursor: pointer;
+  transition: background 0.2s;
+  box-shadow: 0 4px 12px rgba(34,163,72,0.3);
+}
+
+.courier-claim-btn:hover { background: #1a8f3c; }
+
+.courier-update-btn {
+  padding: 11px 20px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: 'Nunito', sans-serif;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.courier-update-btn:hover { background: #1d4ed8; }
+.courier-update-btn:disabled { background: #9ca3af; cursor: default; }
+
+/* DARK MODE additions */
+body.dark-mode .courier-order-card { background: #1f2937; border-color: #374151; }
+body.dark-mode .courier-order-header strong { color: #eee; }
+body.dark-mode .courier-order-address { background: #111; }
+body.dark-mode .courier-order-address strong { color: #eee; }
