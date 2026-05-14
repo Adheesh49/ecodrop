@@ -24,7 +24,7 @@ CORS(app, resources={r"/*": {"origins": [
 socketio = SocketIO(app, cors_allowed_origins=[
     "http://localhost:3000",
     "https://ecodrop-b69t.vercel.app"
-])
+], async_mode="threading")
 
 # REGISTER BLUEPRINTS
 app.register_blueprint(items_bp)
