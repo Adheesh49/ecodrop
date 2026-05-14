@@ -14,17 +14,8 @@ from routes.messages import messages_bp, register_socket_events
 app = Flask(__name__)
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "ecodrop-secret-key")
 
-# FIX: use exact Vercel URL instead of wildcard
-CORS(app, resources={r"/*": {"origins": [
-    "http://localhost:3000",
-    "https://ecodrop-b69t.vercel.app"
-]}})
-
-# FIX: use exact Vercel URL instead of wildcard
-socketio = SocketIO(app, async_mode='threading', cors_allowed_origins=[
-    "http://localhost:3000",
-    "https://ecodrop-b69t.vercel.app"
-])
+CORS(app, resources={r"/*": {"origins": "*"}})
+socketio = SocketIO(app, cors_allowed_origins="*")
 
 # REGISTER BLUEPRINTS
 app.register_blueprint(items_bp)
@@ -145,4 +136,11 @@ def reset_password():
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
-    socketio.run(app, debug=False, host="0.0.0.0", port=port)
+    socketio.run(
+        app,
+        debug=False,
+        host="0.0.0.0",
+        port=port,
+        allow_unsafe_werkzeug=True
+    )
+    
