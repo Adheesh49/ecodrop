@@ -43,13 +43,16 @@ function DashboardHeader({ toggleDarkMode }) {
         <nav className="dash-nav">
           <Link to="/dashboard">Dashboard</Link>
           <Link to="/items">Items</Link>
-          {/* EDIT: renamed from Upload to Add Item, points to /add-item */}
           <Link to="/add-item">Add Item</Link>
           <Link to="/messages">Messages</Link>
-          <Link to="/courier">Courier</Link>
-          <Link to="/my-orders">My Orders</Link>
+          <Link to="/my-orders">📦 My Orders</Link>
 
+          {/* COURIER — only visible to couriers */}
+          {role === "courier" && (
+            <Link to="/courier">🚴 Courier</Link>
+          )}
 
+          {/* ADMIN — only visible to admins */}
           {role === "admin" && (
             <Link to="/admin-dashboard">Admin</Link>
           )}
