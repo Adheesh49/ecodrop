@@ -21,7 +21,7 @@ CORS(app, resources={r"/*": {"origins": [
 ]}})
 
 # FIX: use exact Vercel URL instead of wildcard
-socketio = SocketIO(app, cors_allowed_origins=[
+socketio = SocketIO(app, async_mode='threading', cors_allowed_origins=[
     "http://localhost:3000",
     "https://ecodrop-b69t.vercel.app"
 ])
