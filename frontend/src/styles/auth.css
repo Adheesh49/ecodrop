@@ -1,28 +1,23 @@
-/* ── auth.css ─────────────────────────────────────────── */
-
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
 
-/* Page background – soft mint green like the screenshot */
 .auth-container {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #e6f7ef;
+  background-color: #f8fafc;
   font-family: 'Nunito', sans-serif;
   padding: 24px;
-  /* EDIT: smooth transition on dark mode toggle */
   transition: background 0.3s, color 0.3s;
 }
 
-/* White card */
 .auth-card {
   background: #ffffff;
   border-radius: 20px;
   padding: 36px 40px 32px;
   width: 100%;
   max-width: 440px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.08);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -30,34 +25,28 @@
   transition: background 0.3s, box-shadow 0.3s;
 }
 
-/* ── Logo ─────────────────────────────────────────────── */
 .auth-logo {
   width: 96px;
   height: 96px;
   border-radius: 16px;
   overflow: hidden;
-  background: #d4f0e2;
+  background: #dcfce7;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.auth-logo img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
+.auth-logo img { width: 100%; height: 100%; object-fit: contain; }
 
 .auth-logo::after {
   content: attr(data-initials);
   font-size: 28px;
   font-weight: 800;
-  color: #2e7d52;
+  color: #15803d;
 }
 
-/* ── Tagline ──────────────────────────────────────────── */
 .auth-tagline {
-  color: #27a24f;
+  color: #16a34a;
   font-size: 15px;
   font-weight: 600;
   margin: 0;
@@ -65,11 +54,10 @@
   text-align: center;
 }
 
-/* ── Tab switcher ─────────────────────────────────────── */
 .auth-tabs {
   display: flex;
   width: 100%;
-  background: #f0f0f0;
+  background: #f1f5f9;
   border-radius: 999px;
   padding: 4px;
   gap: 0;
@@ -84,28 +72,22 @@
   font-size: 14px;
   font-weight: 700;
   text-decoration: none;
-  color: #777;
+  color: #6b7280;
   transition: background 0.2s, color 0.2s, box-shadow 0.2s;
 }
 
 .auth-tab.active {
   background: #ffffff;
-  color: #111;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.10);
+  color: #111827;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.10);
 }
 
-/* ── Fields ───────────────────────────────────────────── */
-.auth-field {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
+.auth-field { width: 100%; display: flex; flex-direction: column; gap: 6px; }
 
 .auth-field label {
   font-size: 13px;
   font-weight: 700;
-  color: #222;
+  color: #111827;
   transition: color 0.3s;
 }
 
@@ -114,33 +96,24 @@
   padding: 12px 16px;
   border: none;
   border-radius: 10px;
-  background: #f3f3f3;
+  background: #f1f5f9;
   font-size: 14px;
   font-family: 'Nunito', sans-serif;
-  color: #333;
+  color: #111827;
   outline: none;
   transition: box-shadow 0.2s, background 0.3s, color 0.3s;
   box-sizing: border-box;
 }
 
-.auth-field input::placeholder {
-  color: #aaa;
-}
+.auth-field input::placeholder { color: #9ca3af; }
 
 .auth-field input:focus {
-  box-shadow: 0 0 0 2.5px #27a24f55;
-  background: #edf9f2;
+  box-shadow: 0 0 0 2.5px #16a34a55;
+  background: #f0fdf4;
 }
 
-/* Password row with eye toggle */
-.password-wrapper {
-  position: relative;
-  width: 100%;
-}
-
-.password-wrapper input {
-  padding-right: 44px;
-}
+.password-wrapper { position: relative; width: 100%; }
+.password-wrapper input { padding-right: 44px; }
 
 .toggle-eye {
   position: absolute;
@@ -150,22 +123,19 @@
   background: none;
   border: none;
   cursor: pointer;
-  color: #aaa;
+  color: #9ca3af;
   display: flex;
   align-items: center;
   padding: 0;
   transition: color 0.2s;
 }
 
-.toggle-eye:hover {
-  color: #27a24f;
-}
+.toggle-eye:hover { color: #16a34a; }
 
-/* ── Login button ─────────────────────────────────────── */
 .auth-btn {
   width: 100%;
   padding: 14px;
-  background: #22a348;
+  background: #16a34a;
   color: #fff;
   font-size: 15px;
   font-weight: 700;
@@ -179,22 +149,19 @@
   gap: 8px;
   letter-spacing: 0.01em;
   transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
-  box-shadow: 0 4px 14px rgba(34, 163, 72, 0.35);
+  box-shadow: 0 4px 14px rgba(22,163,74,0.35);
 }
 
 .auth-btn:hover {
-  background: #1a8f3c;
-  box-shadow: 0 6px 18px rgba(34, 163, 72, 0.45);
+  background: #15803d;
+  box-shadow: 0 6px 18px rgba(22,163,74,0.45);
 }
 
-.auth-btn:active {
-  transform: scale(0.98);
-}
+.auth-btn:active { transform: scale(0.98); }
 
-/* ── Info banner ──────────────────────────────────────── */
 .auth-banner {
   width: 100%;
-  background: #edf9f2;
+  background: #f0fdf4;
   border-radius: 12px;
   padding: 14px 16px;
   display: flex;
@@ -203,31 +170,14 @@
   box-sizing: border-box;
 }
 
-.banner-icon {
-  font-size: 18px;
-  flex-shrink: 0;
-  margin-top: 1px;
-}
-
-.auth-banner p {
-  margin: 0;
-  font-size: 13px;
-  color: #2e7d52;
-  line-height: 1.6;
-  text-align: left;
-}
-
-.auth-banner strong {
-  color: #1a6640;
-}
-
-
-/* ── FORGOT PASSWORD ─────────────────────────────────── */
+.banner-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+.auth-banner p { margin: 0; font-size: 13px; color: #15803d; line-height: 1.6; text-align: left; }
+.auth-banner strong { color: #14532d; }
 
 .auth-forgot-btn {
   background: none;
   border: none;
-  color: #22a348;
+  color: #2563eb;
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
@@ -241,17 +191,12 @@
 
 .auth-forgot-btn:hover { opacity: 0.7; }
 
-.forgot-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 16px;
-}
+.forgot-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
 
 .forgot-back {
   background: none;
   border: none;
-  color: #22a348;
+  color: #2563eb;
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
@@ -259,76 +204,36 @@
   padding: 0;
 }
 
-.forgot-title {
-  font-size: 18px;
-  font-weight: 800;
-  color: #111;
-  margin: 0;
-}
+.forgot-title { font-size: 18px; font-weight: 800; color: #111827; margin: 0; }
 
-.forgot-steps {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  margin-bottom: 20px;
-}
+.forgot-steps { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 20px; }
 
-.forgot-step {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-}
+.forgot-step { display: flex; flex-direction: column; align-items: center; gap: 4px; }
 
 .forgot-step span {
-  width: 28px;
-  height: 28px;
+  width: 28px; height: 28px;
   border-radius: 50%;
-  background: #e0e0e0;
-  color: #888;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 13px;
-  font-weight: 700;
+  background: #e5e7eb;
+  color: #6b7280;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700;
   transition: all 0.3s;
 }
 
-.forgot-step.active span {
-  background: #22a348;
-  color: white;
-}
+.forgot-step.active span { background: #16a34a; color: white; }
+.forgot-step label { font-size: 10px; color: #6b7280; font-weight: 600; }
+.forgot-step.active label { color: #16a34a; }
 
-.forgot-step label {
-  font-size: 10px;
-  color: #888;
-  font-weight: 600;
-}
-
-.forgot-step.active label { color: #22a348; }
-
-.forgot-step-line {
-  width: 40px;
-  height: 2px;
-  background: #e0e0e0;
-  margin-bottom: 14px;
-}
-
-.forgot-desc {
-  font-size: 13px;
-  color: #888;
-  margin: 0 0 14px 0;
-  line-height: 1.5;
-}
+.forgot-step-line { width: 40px; height: 2px; background: #e5e7eb; margin-bottom: 14px; }
+.forgot-desc { font-size: 13px; color: #6b7280; margin: 0 0 14px 0; line-height: 1.5; }
 
 .forgot-question-box {
   background: #f0fdf4;
-  border: 1px solid #22a348;
+  border: 1px solid #16a34a;
   border-radius: 10px;
   padding: 12px 14px;
   font-size: 13px;
-  color: #1a5c2e;
+  color: #14532d;
   font-weight: 600;
   line-height: 1.5;
 }
@@ -354,80 +259,35 @@
 }
 
 .forgot-success span { font-size: 48px; }
-.forgot-success h3 { font-size: 20px; font-weight: 800; color: #22a348; margin: 0; }
-.forgot-success p { font-size: 14px; color: #555; margin: 0; }
+.forgot-success h3 { font-size: 20px; font-weight: 800; color: #16a34a; margin: 0; }
+.forgot-success p { font-size: 14px; color: #6b7280; margin: 0; }
 
 .auth-select {
   width: 100%;
   padding: 12px 14px;
-  border: 2px solid #e0e0e0;
+  border: 2px solid #e5e7eb;
   border-radius: 10px;
   font-size: 14px;
   font-family: 'Nunito', sans-serif;
-  color: #333;
+  color: #111827;
   background: white;
   outline: none;
   transition: border-color 0.2s;
   cursor: pointer;
 }
 
-.auth-select:focus { border-color: #22a348; }
+.auth-select:focus { border-color: #16a34a; }
 
-/* ── EDIT: Dark mode overrides ────────────────────────────
-   All rules below activate when body has .dark-mode class  */
-
-body.dark-mode .auth-container {
-  background-color: #111;
-}
-
-body.dark-mode .auth-card {
-  background: #1f2937;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-}
-
-body.dark-mode .auth-tagline {
-  color: #22a348;
-}
-
-body.dark-mode .auth-tabs {
-  background: #374151;
-}
-
-body.dark-mode .auth-tab {
-  color: #aaa;
-}
-
-body.dark-mode .auth-tab.active {
-  background: #111;
-  color: #eee;
-}
-
-body.dark-mode .auth-field label {
-  color: #ddd;
-}
-
-body.dark-mode .auth-field input {
-  background: #374151;
-  color: #eee;
-}
-
-body.dark-mode .auth-field input::placeholder {
-  color: #6b7280;
-}
-
-body.dark-mode .auth-field input:focus {
-  background: #2d3748;
-  box-shadow: 0 0 0 2.5px #22a34855;
-}
-
-body.dark-mode .auth-banner {
-  background: #1a2e1f;
-}
-
-body.dark-mode .auth-banner p {
-  color: #6ee7a0;
-}
-
-body.dark-mode .auth-banner strong {
-  color: #4ade80;
-}
+body.dark-mode .auth-container { background-color: #0f172a; }
+body.dark-mode .auth-card { background: #1e293b; box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
+body.dark-mode .auth-tagline { color: #16a34a; }
+body.dark-mode .auth-tabs { background: #334155; }
+body.dark-mode .auth-tab { color: #94a3b8; }
+body.dark-mode .auth-tab.active { background: #0f172a; color: #e2e8f0; }
+body.dark-mode .auth-field label { color: #e2e8f0; }
+body.dark-mode .auth-field input { background: #334155; color: #e2e8f0; }
+body.dark-mode .auth-field input::placeholder { color: #64748b; }
+body.dark-mode .auth-field input:focus { background: #1e3a2e; box-shadow: 0 0 0 2.5px #16a34a55; }
+body.dark-mode .auth-banner { background: #1a2e1f; }
+body.dark-mode .auth-banner p { color: #4ade80; }
+body.dark-mode .auth-banner strong { color: #86efac; }

@@ -45,7 +45,7 @@ function DashboardHeader({ toggleDarkMode }) {
           <Link to="/items">Items</Link>
           <Link to="/add-item">Add Item</Link>
           <Link to="/messages">Messages</Link>
-          <Link to="/my-orders">📦 My Orders</Link>
+          <Link to="/my-orders">My Orders</Link>
 
           {/* COURIER — only visible to couriers */}
           {role === "courier" && (

@@ -14,7 +14,7 @@
 }
 
 .App-header {
-  background-color: #282c34;
+  background-color: #111827;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -25,68 +25,64 @@
 }
 
 .App-link {
-  color: #61dafb;
+  color: #2563eb;
 }
 
 @keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 body.dark-mode {
-  background: #111;
+  background: #0f172a;
   color: white;
 }
 
 body.dark-mode .dash-header {
-  background: #1f2937;
-  border-bottom: 1px solid #333;
+  background: #1e293b;
+  border-bottom: 1px solid #334155;
 }
 
 body.dark-mode .dash-nav a {
-  color: #ddd;
+  color: #cbd5e1;
 }
 
 body.dark-mode .dash-nav a:hover {
-  color: #22a348;
+  color: #16a34a;
 }
 
 body.dark-mode .dropdown {
-  background: #1f2937;
+  background: #1e293b;
   color: white;
 }
 
 body.dark-mode footer {
-  background: #1f2937;
-  color: #ccc;
+  background: #1e293b;
+  color: #94a3b8;
 }
 
-.items-page{
-padding:20px;
+.items-page {
+  padding: 20px;
 }
 
-.items-page input{
-width:300px;
-padding:10px;
-margin:20px 0;
-border-radius:8px;
-border:1px solid #ccc;
+.items-page input {
+  width: 300px;
+  padding: 10px;
+  margin: 20px 0;
+  border-radius: 8px;
+  border: 1.5px solid #d1d5db;
 }
 
-.items-grid{
-display:grid;
-grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
-gap:20px;
+.items-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
 }
 
-.card img{
-width:100%;
-height:180px;
-object-fit:cover;
-border-radius:8px;
-margin-bottom:10px;
+.card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 10px;
 }
