@@ -6,6 +6,8 @@ import bcrypt
 import os
 from routes.admin import admin_bp
 from routes.orders import orders_bp
+import cloudinary
+import cloudinary.uploader
 
 from routes.items import items_bp
 from routes.messages import messages_bp, register_socket_events
@@ -13,6 +15,12 @@ from routes.messages import messages_bp, register_socket_events
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "ecodrop-secret-key")
+
+cloudinary.config(
+    cloud_name=os.environ.get("CLOUDINARY_CLOUD_NAME"),
+    api_key=os.environ.get("CLOUDINARY_API_KEY"),
+    api_secret=os.environ.get("CLOUDINARY_API_SECRET")
+)
 
 # FIX: use exact Vercel URL instead of wildcard
 CORS(app, resources={r"/*": {"origins": [
@@ -142,6 +150,13 @@ def reset_password():
 
     return jsonify({"message": "Password reset successful! You can now login."})
 
+@app.route("/upload", methods=["POST"])
+def upload_image():
+    file = request.files.get("image")
+    if not file:
+        return jsonify({"message": "No file provided"}), 400
+    result = cloudinary.uploader.upload(file)
+    return jsonify({"url": result["secure_url"]})
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))

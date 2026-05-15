@@ -41,18 +41,32 @@ function AddItem({ toggleDarkMode }) {
     setForm(f => ({ ...f, [name]: type === "checkbox" ? checked : value }));
   };
 
-  const handleImageChange = (e) => {
-    const files = Array.from(e.target.files);
-    const readers = files.map(file => new Promise(resolve => {
-      const reader = new FileReader();
-      reader.onload = (ev) => resolve(ev.target.result);
-      reader.readAsDataURL(file);
-    }));
-    Promise.all(readers).then(results => {
-      setPreviewImages(results);
-      setForm(f => ({ ...f, images: results }));
+  const handleImageChange = async (e) => {
+  const files = Array.from(e.target.files);
+  
+  // Show local previews immediately
+  const readers = files.map(file => new Promise(resolve => {
+    const reader = new FileReader();
+    reader.onload = (ev) => resolve(ev.target.result);
+    reader.readAsDataURL(file);
+  }));
+  const previews = await Promise.all(readers);
+  setPreviewImages(previews);
+
+  // Upload each file to Cloudinary via your backend
+  const urls = await Promise.all(files.map(async (file) => {
+    const formData = new FormData();
+    formData.append("image", file);
+    const res = await fetch(`${API}/upload`, {
+      method: "POST",
+      body: formData
     });
-  };
+    const data = await res.json();
+    return data.url;
+  }));
+
+  setForm(f => ({ ...f, images: urls })); // store Cloudinary URLs, not base64
+};
 
   const handleSubmit = async () => {
     if (!form.title || !form.category || !form.condition || !form.description) {
