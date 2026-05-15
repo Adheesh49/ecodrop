@@ -7,7 +7,7 @@ import Fuse from "fuse.js";
 const API = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
 const CATEGORIES = ["All", "Furniture", "Clothes", "Electronics", "Kitchen", "Books", "Toys", "Sports", "Other"];
-const PAGE_SIZE = 16;
+const PAGE_SIZE = 1000;
 
 const conditionStyle = {
   new:       { color: "#16a34a", background: "#dcfce7" },
